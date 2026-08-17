@@ -12,6 +12,8 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Follows the OS appearance setting (light/dark), not a custom theme.
+   If macOS is set to Auto, this kicks in at night. */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
