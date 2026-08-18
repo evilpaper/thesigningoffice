@@ -1,13 +1,15 @@
 import Link from "next/link";
+import Logo from "./logo";
 
 export default function Header() {
   return (
     <header className="w-full flex flex-col sm:flex-row justify-between items-center p-8 gap-8">
       <Link
         href="/"
-        className="flex items-center gap-3 w-fit"
+        className="flex items-center gap-1 w-fit"
         aria-label="Express Signering - Home"
       >
+        <Logo />
         <h1>The Signing Office</h1>
       </Link>
       <Link href="/system-admin">
