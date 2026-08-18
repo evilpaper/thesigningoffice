@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +24,26 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+      <header className="w-full flex flex-col sm:flex-row justify-between items-center p-8 gap-8">
+					<Link
+						href="/"
+						className="flex items-center gap-3 w-fit"
+						aria-label="Express Signering - Home"
+					>
+						<h1>The Signing Office</h1>
+					</Link>
+					<Link href="/system-admin">
+						<button>System Admin</button>
+					</Link>
+				</header>
+				{children}
+        <footer className="w-full flex gap-[24px] flex-wrap items-center justify-between p-8">
+					<Link href="/privacy" className="text-sm">
+						Privacy
+					</Link>
+				</footer>
+      </body>
     </html>
   );
 }
