@@ -28,7 +28,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <Header />
-        {children}
+        <section className="flex-1 flex flex-col font-sans items-center justify-items-center p-8 gap-4">
+          {children}
+        </section>
         <Footer />
       </body>
     </html>
