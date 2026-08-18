@@ -1,23 +1,24 @@
-'use client' // Error boundaries must be Client Components
- 
-import { useEffect } from 'react'
- 
+"use client"; // Error boundaries must be Client Components
+
+import { useEffect } from "react";
+
 export default function ErrorPage({
   error,
   retry,
 }: {
-  error: Error & { digest?: string }
-  retry: () => void
+  error: Error & { digest?: string };
+  retry: () => void;
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error(error)
-  }, [error])
- 
+    console.error(error);
+  }, [error]);
+
   return (
     <div>
       <h2>Something went wrong!</h2>
       <button
+        type="button"
         onClick={
           // Attempt to recover by re-fetching and re-rendering the segment
           () => retry()
@@ -26,5 +27,5 @@ export default function ErrorPage({
         Try again
       </button>
     </div>
-  )
+  );
 }
