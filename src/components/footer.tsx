@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ThemeToggle from "./theme-toggle";
 
 export default function Footer() {
   return (
@@ -6,6 +7,7 @@ export default function Footer() {
       <Link href="/privacy" className="text-sm">
         Privacy
       </Link>
+      <ThemeToggle />
     </footer>
   );
 }
