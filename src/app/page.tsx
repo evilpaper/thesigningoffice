@@ -16,7 +16,6 @@ export default function Home() {
           </p>
         </article>
       </section>
-      <section className="flex flex-1 min-w-0 flex-col gap-2"></section>
     </main>
   );
 }
