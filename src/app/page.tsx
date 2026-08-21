@@ -1,3 +1,5 @@
+import StartSigningForm from "@/features/signing/start-signing-form";
+
 export default function Home() {
   return (
     <main className="flex flex-1 w-full max-w-7xl mx-auto flex-col lg:flex-row lg:items-start gap-12 lg:gap-16 px-8">
@@ -12,16 +14,7 @@ export default function Home() {
             och helt utan krånglig registrering.
           </p>
         </article>
-        <form className="flex flex-col items-start gap-4">
-          <label className="flex flex-col items-start gap-2">
-            <input
-              type="file"
-              name="file"
-              className="text-foreground file:mr-4 file:rounded-none file:border file:border-foreground file:bg-transparent file:px-3 file:py-1.5 file:font-medium file:text-foreground"
-            />
-          </label>
-          <button type="submit">Upload</button>
-        </form>
+        <StartSigningForm />
       </section>
     </main>
   );
