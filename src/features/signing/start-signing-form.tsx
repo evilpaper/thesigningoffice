@@ -1,6 +1,10 @@
+"use client";
+
+import { uploadFile } from "./start-signing-upload-action";
+
 export default function StartSigningForm() {
   return (
-    <form className="flex flex-col items-start gap-4">
+    <form className="flex flex-col items-start gap-4" action={uploadFile}>
       <label className="flex flex-col items-start gap-2">
         <input
           type="file"
