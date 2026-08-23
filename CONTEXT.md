@@ -13,7 +13,7 @@ A user's explicit theme choice that should be reused in later visits.
 _Avoid_: Theme setting, mode preference
 
 **Document**:
-The file being signed.
+The file being signed. It exists only as part of a Signing, not as a standalone library item.
 _Avoid_: File, PDF, attachment
 
 **Signing**:
