@@ -1,7 +1,8 @@
 "use server";
 
-import fs from "node:fs/promises";
 import { revalidatePath } from "next/cache";
+
+import { storeDocument } from "@/lib/document";
 
 export async function startSigning(formData: FormData) {
   const document = formData.get("document");
@@ -12,7 +13,7 @@ export async function startSigning(formData: FormData) {
   const arrayBuffer = await document.arrayBuffer();
   const buffer = new Uint8Array(arrayBuffer);
 
-  await fs.writeFile(`./public/uploads/${document.name}`, buffer);
+  await storeDocument({ bytes: buffer, fileName: document.name });
 
   revalidatePath("/");
 }
