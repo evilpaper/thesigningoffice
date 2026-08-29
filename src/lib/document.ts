@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -15,32 +14,33 @@ function getDocumentStorage(): DocumentStorage {
   );
 }
 
-function createDocumentKey(fileName: string): string {
+export function createDocumentKey(signingId: string, fileName: string): string {
   const baseName = path.basename(fileName);
   const extension = path.extname(baseName);
-  return `documents/${randomUUID()}${extension}`;
+  return `documents/${signingId}${extension}`;
 }
 
 async function storeDocumentLocally(
   bytes: Uint8Array,
-  fileName: string,
-): Promise<{ key: string }> {
-  const key = createDocumentKey(fileName);
+  key: string,
+): Promise<void> {
   const filePath = path.join("public", "uploads", key);
 
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, bytes);
-
-  return { key };
 }
 
 export async function storeDocument(input: {
+  signingId: string;
   bytes: Uint8Array;
   fileName: string;
 }): Promise<{ key: string }> {
+  const key = createDocumentKey(input.signingId, input.fileName);
+
   switch (getDocumentStorage()) {
     case "local":
-      return storeDocumentLocally(input.bytes, input.fileName);
+      await storeDocumentLocally(input.bytes, key);
+      return { key };
     case "bucket":
       throw new Error("Document bucket storage is not configured yet.");
   }
