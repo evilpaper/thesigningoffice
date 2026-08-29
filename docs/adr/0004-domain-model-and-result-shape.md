@@ -1,13 +1,13 @@
 # Domain model behind Server Actions; typed results for expected failures
 
-Server Actions are HTTP adapters, not the domain. Each slice keeps a thin `"use server"` function (e.g. `startSigning`) that parses `FormData`, calls a domain orchestrator in the same folder (e.g. `createDraftSigning`), maps the result for the UI, and runs framework concerns (`revalidatePath`) only on success. The orchestrator owns product language and workflow; it does not import Next.js, React, or Drizzle.
+Server Actions are HTTP adapters, not the domain. Each slice keeps a thin `"use server"` function (e.g. `startSigning`) that parses `FormData`, allocates a `signingId`, calls a domain orchestrator in the same folder (e.g. `createSigning`), maps the result for the UI, and runs framework concerns (`revalidatePath`) only on success. The orchestrator owns product language and workflow; it does not import Next.js, React, or Drizzle.
 
 Domain orchestrators take plain input and injected **ports** (interfaces), not concrete infra:
 
 - `DocumentStore` — store bytes, delete by key (`src/lib/document.ts` implements this).
-- `SigningRepository` — persist Draft Signing state (`src/lib/db/` implements this with Drizzle + Postgres).
+- `SigningRepository` — persist Signing state (`src/lib/db/` implements this with Drizzle + Postgres). New Signings are stored with Draft status; that is a column default, not part of operation names.
 
-Infra stays in `src/lib/`. The slice stays flat: `create-draft-signing.ts` beside `start-signing.ts`, not a `model/` folder until a second kind of domain file actually appears.
+Infra stays in `src/lib/`. The slice stays flat: `create-signing.ts` beside `start-signing.ts`, not a `model/` folder until a second kind of domain file actually appears. `createDocumentKey(signingId, fileName)` is a pure function in `src/lib/document.ts`.
 
 ## Result shape
 
@@ -27,9 +27,9 @@ The Server Action returns this result unchanged. Client UI uses `useActionState`
 
 Postgres transactions cannot include filesystem or bucket writes. "All succeed or leave no Signing" is a **compensating saga**, not one ACID transaction:
 
-1. Generate document key in memory (no I/O).
+1. Derive `documentKey` from `signingId` and `fileName` (pure, no I/O).
 2. Write bytes via `DocumentStore`.
-3. Insert Draft Signing + Document metadata in a DB transaction via `SigningRepository`.
+3. Insert Signing + Document metadata in a DB transaction via `SigningRepository.create`.
 4. If step 3 fails → delete the file via `DocumentStore` → return `databaseUnavailable` (or `storageFailed` if compensation fails).
 5. If step 3 succeeds → return `{ ok: true, signingId }`.
 
