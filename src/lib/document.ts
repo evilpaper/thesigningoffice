@@ -31,16 +31,13 @@ async function storeDocumentLocally(
 }
 
 export async function storeDocument(input: {
-  signingId: string;
   bytes: Uint8Array;
-  fileName: string;
-}): Promise<{ key: string }> {
-  const key = createDocumentKey(input.signingId, input.fileName);
-
+  key: string;
+}): Promise<void> {
   switch (getDocumentStorage()) {
     case "local":
-      await storeDocumentLocally(input.bytes, key);
-      return { key };
+      await storeDocumentLocally(input.bytes, input.key);
+      return;
     case "bucket":
       throw new Error("Document bucket storage is not configured yet.");
   }
