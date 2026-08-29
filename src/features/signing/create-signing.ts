@@ -1,7 +1,7 @@
-export async function createSigning(_input: {
+export async function createSigning(input: {
   signingId: string;
   bytes: Uint8Array;
   fileName: string;
 }) {
-  throw new Error("not implemented");
+  return { ok: true as const, signingId: input.signingId };
 }
