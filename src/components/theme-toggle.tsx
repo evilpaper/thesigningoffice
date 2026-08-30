@@ -6,7 +6,7 @@ import {
   getEffectiveTheme,
   type Theme,
   themeToggleLabel,
-} from "@/lib/theme";
+} from "@/components/theme";
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("light");

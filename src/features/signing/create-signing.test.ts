@@ -5,7 +5,7 @@ import { createSigning } from "./create-signing";
  * When someone starts a Signing, the orchestrator should hand the bytes to something that knows how to store Documents — with this key and these bytes.
  * - createSigning = product logic (“derive a key, store the Document, later also save Signing state”)
  * - DocumentStore = “something that can store/delete Document bytes”
- * - src/lib/document.ts = the real implementation for prod (local disk or bucket)
+ * - src/infrastructure/document.ts = the real implementation for prod (local disk or bucket)
  */
 
 describe("createSigning", () => {

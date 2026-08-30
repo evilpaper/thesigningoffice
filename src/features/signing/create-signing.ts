@@ -1,4 +1,4 @@
-import { createDocumentKey } from "@/lib/document";
+import { createDocumentKey } from "@/infrastructure/document";
 
 /**
  * This is a port type.

@@ -2,12 +2,12 @@
 
 Server Actions are HTTP adapters, not the domain. Each slice keeps a thin `"use server"` function (e.g. `startSigning`) that parses `FormData`, allocates a `signingId`, calls a domain orchestrator in the same folder (e.g. `createSigning`), maps the result for the UI, and runs framework concerns (`revalidatePath`) only on success. The orchestrator owns product language and workflow; it does not import Next.js, React, or Drizzle.
 
-Domain orchestrators take plain input and injected **ports** (interfaces), not concrete infra:
+Domain orchestrators take plain input and injected **ports** (interfaces), not concrete infrastructure:
 
-- `DocumentStore` — store bytes, delete by key (`src/lib/document.ts` implements this).
-- `SigningRepository` — persist Signing state (`src/lib/db/` implements this with Drizzle + Postgres). New Signings are stored with Draft status; that is a column default, not part of operation names.
+- `DocumentStore` — store bytes, delete by key (`src/infrastructure/document.ts` implements this).
+- `SigningRepository` — persist Signing state (`src/infrastructure/db/` implements this with Drizzle + Postgres). New Signings are stored with Draft status; that is a column default, not part of operation names.
 
-Infra stays in `src/lib/`. The slice stays flat: `create-signing.ts` beside `start-signing.ts`, not a `model/` folder until a second kind of domain file actually appears. `createDocumentKey(signingId, fileName)` is a pure function in `src/lib/document.ts`.
+Infrastructure stays in `src/infrastructure/`. The slice stays flat: `create-signing.ts` beside `start-signing.ts`, not a `model/` folder until a second kind of domain file actually appears. `createDocumentKey(signingId, fileName)` is a pure function in `src/infrastructure/document.ts`.
 
 ## Result shape
 
