@@ -30,6 +30,11 @@ async function storeDocumentLocally(
   await fs.writeFile(filePath, bytes);
 }
 
+async function deleteDocumentLocally(key: string): Promise<void> {
+  const filePath = path.join("public", "uploads", key);
+  await fs.unlink(filePath);
+}
+
 export async function storeDocument(input: {
   bytes: Uint8Array;
   key: string;
@@ -42,3 +47,18 @@ export async function storeDocument(input: {
       throw new Error("Document bucket storage is not configured yet.");
   }
 }
+
+export async function deleteDocument(key: string): Promise<void> {
+  switch (getDocumentStorage()) {
+    case "local":
+      await deleteDocumentLocally(key);
+      return;
+    case "bucket":
+      throw new Error("Document bucket storage is not configured yet.");
+  }
+}
+
+export const documentStore = {
+  store: storeDocument,
+  delete: deleteDocument,
+};
