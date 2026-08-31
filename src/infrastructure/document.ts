@@ -3,6 +3,12 @@ import path from "node:path";
 
 type DocumentStorageKind = "local" | "bucket";
 
+const LOCAL_UPLOAD_ROOT = path.join("public", "uploads");
+
+function localDocumentPath(key: string): string {
+  return path.join(LOCAL_UPLOAD_ROOT, key);
+}
+
 function getDocumentStorageKind(): DocumentStorageKind {
   const value = process.env.DOCUMENT_STORAGE ?? "local";
   if (value === "local" || value === "bucket") {
@@ -24,14 +30,14 @@ async function storeDocumentLocally(
   bytes: Uint8Array,
   key: string,
 ): Promise<void> {
-  const filePath = path.join("public", "uploads", key);
+  const filePath = localDocumentPath(key);
 
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, bytes);
 }
 
 async function deleteDocumentLocally(key: string): Promise<void> {
-  const filePath = path.join("public", "uploads", key);
+  const filePath = localDocumentPath(key);
   await fs.unlink(filePath);
 }
 
