@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-type DocumentStorage = "local" | "bucket";
+type DocumentStorageKind = "local" | "bucket";
 
-function getDocumentStorage(): DocumentStorage {
+function getDocumentStorageKind(): DocumentStorageKind {
   const value = process.env.DOCUMENT_STORAGE ?? "local";
   if (value === "local" || value === "bucket") {
     return value;
@@ -39,7 +39,7 @@ export async function storeDocument(input: {
   bytes: Uint8Array;
   key: string;
 }): Promise<void> {
-  switch (getDocumentStorage()) {
+  switch (getDocumentStorageKind()) {
     case "local":
       await storeDocumentLocally(input.bytes, input.key);
       return;
@@ -49,7 +49,7 @@ export async function storeDocument(input: {
 }
 
 export async function deleteDocument(key: string): Promise<void> {
-  switch (getDocumentStorage()) {
+  switch (getDocumentStorageKind()) {
     case "local":
       await deleteDocumentLocally(key);
       return;
