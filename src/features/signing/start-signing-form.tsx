@@ -1,30 +1,52 @@
 "use client";
 
-import { useActionState } from "react";
-import { startSigning } from "./start-signing";
+import { useEffect, useState } from "react";
 
 export default function StartSigningForm() {
-  const [state, formAction, pending] = useActionState(startSigning, null);
+  const [file, setFile] = useState<File | null>(null);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!file) {
+      setBlobUrl(null);
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+    setBlobUrl(url);
+
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [file]);
+
+  if (file) {
+    if (!blobUrl) {
+      return null;
+    }
+
+    return (
+      <iframe
+        title={file.name}
+        src={blobUrl}
+        className="min-h-[70dvh] w-full flex-1 border-0 bg-muted lg:min-h-0"
+      />
+    );
+  }
 
   return (
-    <form className="flex flex-col items-start gap-4" action={formAction}>
+    <form className="flex flex-col items-start gap-4">
       <label className="flex flex-col items-start gap-2">
         <input
           type="file"
           name="document"
+          accept="application/pdf"
+          onChange={(event) => {
+            setFile(event.target.files?.[0] ?? null);
+          }}
           className="text-foreground file:mr-4 file:rounded-none file:border file:border-foreground file:bg-transparent file:px-3 file:py-1.5 file:font-medium file:text-foreground"
         />
       </label>
-      {state?.ok === false && (
-        <p className="text-sm text-red-500">Ingen dokument valt</p>
-      )}
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-none border border-foreground bg-foreground px-3 py-1.5 font-medium text-background disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        Starta signering
-      </button>
     </form>
   );
 }
