@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 
 export default function StartSigningForm() {
   const [file, setFile] = useState<File | null>(null);
+  /**
+   * Viewers and media tags expect a string URL as src="..."
+   * Thus when we have the file in JS memory we need to create a URL for it
+   * so it can be used as a src="..." and rendered in the browser
+   */
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
   useEffect(() => {
