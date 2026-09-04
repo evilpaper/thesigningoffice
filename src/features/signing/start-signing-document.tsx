@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export default function StartSigningForm() {
+export default function StartSigningDocument() {
   const [file, setFile] = useState<File | null>(null);
   /**
    * Viewers and media tags expect a string URL as src="..."
@@ -25,11 +25,7 @@ export default function StartSigningForm() {
     };
   }, [file]);
 
-  if (file) {
-    if (!blobUrl) {
-      return null;
-    }
-
+  if (file && blobUrl) {
     return (
       <iframe
         title={file.name}
