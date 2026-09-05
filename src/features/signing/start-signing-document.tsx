@@ -1,30 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import DocumentViewer from "./document-viewer";
 
-/**
- * What we know about the Document on this screen.
- * blob URLs are a DOM resource — created/revoked in an effect, not stored here.
- */
 type State = { status: "idle" } | { status: "viewing"; file: File };
 
 export default function StartSigningDocument() {
   const [state, setState] = useState<State>({ status: "idle" });
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (state.status !== "viewing") {
-      setBlobUrl(null);
-      return;
-    }
-
-    const url = URL.createObjectURL(state.file);
-    setBlobUrl(url);
-
-    return () => {
-      URL.revokeObjectURL(url);
-    };
-  }, [state]);
 
   if (state.status === "idle") {
     return (
@@ -47,15 +29,5 @@ export default function StartSigningDocument() {
     );
   }
 
-  if (!blobUrl) {
-    return null;
-  }
-
-  return (
-    <iframe
-      title={state.file.name}
-      src={blobUrl}
-      className="min-h-[70dvh] w-full flex-1 border-0 bg-muted lg:min-h-0"
-    />
-  );
+  return <DocumentViewer file={state.file} />;
 }
