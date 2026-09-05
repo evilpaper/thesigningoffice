@@ -2,6 +2,7 @@
 
 export default function DocumentViewer({ file }: { file: File }) {
   const blobUrl = URL.createObjectURL(file);
+
   return (
     <iframe
       title={file.name}
