@@ -23,42 +23,6 @@ function acceptError(accept: string): string {
   return `Ogiltig filtyp. Accepteras: ${accept}`;
 }
 
-function UploadIcon() {
-  return (
-    <svg
-      width="40"
-      height="40"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-      className="text-muted-foreground"
-    >
-      <path
-        d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M17 8l-5-5-5 5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12 3v12"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 export default function Dropzone({
   onFilesSelected,
   accept = "*",
@@ -149,7 +113,9 @@ export default function Dropzone({
           }
         `}
       >
-        <UploadIcon />
+        <span className="text-5xl select-none" aria-hidden="true">
+          📄
+        </span>
 
         <p className="text-muted-foreground text-base text-center">
           {isDragging
