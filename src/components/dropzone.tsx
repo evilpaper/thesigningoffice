@@ -95,14 +95,14 @@ export default function Dropzone({
   };
 
   return (
-    <section className="w-full flex flex-col items-center justify-center">
+    <section className="w-full">
       <label
         htmlFor={inputId}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`
-          flex flex-col items-center justify-center gap-3
+          flex w-full min-h-64 lg:min-h-80 flex-col items-center justify-center gap-3
           border border-dashed rounded-2xl
           bg-muted p-10 cursor-pointer
           transition-colors duration-200
