@@ -9,7 +9,7 @@ export default function DocumentPicker({
 }) {
   return (
     <Dropzone
-      onFilesSelected={(files) => {
+      onChange={(files) => {
         onChange(files[0]);
       }}
       accept="application/pdf"

@@ -3,7 +3,7 @@
 import { type ChangeEvent, type DragEvent, useCallback, useState } from "react";
 
 interface DropzoneProps {
-  onFilesSelected: (files: File[]) => void;
+  onChange: (files: File[]) => void;
   accept?: string;
   multiple?: boolean;
 }
@@ -24,7 +24,7 @@ function acceptError(accept: string): string {
 }
 
 export default function Dropzone({
-  onFilesSelected,
+  onChange,
   accept = "*",
   multiple = false,
 }: DropzoneProps) {
@@ -60,9 +60,9 @@ export default function Dropzone({
     (files: FileList | File[]) => {
       const fileArray = Array.from(files);
       if (!validateFiles(fileArray)) return;
-      onFilesSelected(fileArray);
+      onChange(fileArray);
     },
-    [validateFiles, onFilesSelected],
+    [validateFiles, onChange],
   );
 
   const handleDragOver = (e: DragEvent<HTMLLabelElement>) => {
