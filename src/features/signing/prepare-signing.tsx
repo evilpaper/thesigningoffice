@@ -1,6 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+
+// react-pdf / pdf.js need the browser (DOM, canvas, web workers).
+// "use client" is not enough — Client Components still SSR in Next.js.
+// dynamic(..., { ssr: false }) skips the server and loads PdfViewer only in
+// the browser, where those APIs exist.
+const PdfViewer = dynamic(
+  () => import("@/components/pdf-viewer").then((mod) => mod.PdfViewer),
+  {
+    ssr: false,
+  },
+);
 
 export default function PrepareSigning({ file }: { file: File }) {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
@@ -20,11 +32,5 @@ export default function PrepareSigning({ file }: { file: File }) {
     return null;
   }
 
-  return (
-    <iframe
-      title={file.name}
-      src={blobUrl}
-      className="min-h-[70dvh] w-full flex-1 border-0 bg-muted lg:min-h-0"
-    />
-  );
+  return <PdfViewer file={blobUrl} />;
 }
