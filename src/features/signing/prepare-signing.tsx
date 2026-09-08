@@ -14,6 +14,9 @@ const PdfViewer = dynamic(
   },
 );
 
+const documentNameId = "document-name";
+const messageId = "signing-message";
+
 export default function PrepareSigning({
   file,
   onCancel,
@@ -70,12 +73,57 @@ export default function PrepareSigning({
         </button>
       </nav>
 
-      <div className="flex flex-1 min-h-0">
-        {/* Reserved for signers, field tools, and other prepare controls. */}
+      <div className="flex flex-1 min-h-0 flex-col md:flex-row">
         <aside
-          aria-hidden="true"
-          className="hidden w-[280px] shrink-0 border-r border-border bg-background md:block"
-        />
+          aria-label="Dokumentuppgifter"
+          className="w-full shrink-0 border-b border-border bg-background md:w-[280px] md:border-b-0 md:border-r"
+        >
+          <form
+            className="flex flex-col gap-5 p-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+            }}
+          >
+            <div className="flex flex-col gap-2">
+              <label
+                htmlFor={documentNameId}
+                className="text-sm font-medium text-foreground"
+              >
+                Dokumentnamn{" "}
+                <span className="font-normal text-muted-foreground">
+                  (obligatoriskt)
+                </span>
+              </label>
+              <input
+                id={documentNameId}
+                name="documentName"
+                type="text"
+                required
+                defaultValue={file.name}
+                autoComplete="off"
+                className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label
+                htmlFor={messageId}
+                className="text-sm font-medium text-foreground"
+              >
+                Meddelande{" "}
+                <span className="font-normal text-muted-foreground">
+                  (valfritt)
+                </span>
+              </label>
+              <textarea
+                id={messageId}
+                name="message"
+                rows={4}
+                className="resize-y rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              />
+            </div>
+          </form>
+        </aside>
 
         <div className="flex flex-1 min-h-0 justify-center overflow-auto bg-muted p-6 md:p-10">
           {blobUrl ? <PdfViewer file={blobUrl} /> : null}
