@@ -16,10 +16,29 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
+function PdfLoading() {
+  return (
+    <output
+      aria-busy="true"
+      className="block h-120 w-full max-w-105 animate-pulse rounded-md bg-border/60"
+    >
+      <span className="sr-only">Laddar dokument</span>
+    </output>
+  );
+}
+
+function PdfError() {
+  return (
+    <p role="alert" className="max-w-sm text-center text-sm text-destructive">
+      Dokumentet kunde inte visas. Prova att ladda upp filen igen.
+    </p>
+  );
+}
+
 export function PdfViewer({ file }: { file: string }) {
   return (
-    <Document file={file}>
-      <Page pageNumber={1} />
+    <Document file={file} loading={<PdfLoading />} error={<PdfError />}>
+      <Page pageNumber={1} loading={<PdfLoading />} />
     </Document>
   );
 }
