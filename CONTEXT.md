@@ -23,3 +23,7 @@ _Avoid_: Upload, job, session, signing request
 **Draft**:
 The status of a Signing that exists but has not yet been sent to anyone to sign.
 _Avoid_: Draft Signing, pending, unpublished
+
+**Field**:
+A place on the Document where someone is asked to sign or enter information.
+_Avoid_: Annotation, widget, form control
