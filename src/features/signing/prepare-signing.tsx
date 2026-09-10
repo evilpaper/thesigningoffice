@@ -1,10 +1,9 @@
 "use client";
 
-import DocumentDetailsForm, {
-  type DocumentDetailsValues,
-} from "./document-details-form";
 import DocumentPreview from "./document-preview";
+import PrepareSidebar from "./prepare-sidebar";
 import PrepareToolbar from "./prepare-toolbar";
+import type { PrepareSigningValues } from "./prepare-values";
 import { useObjectUrl } from "./use-object-url";
 
 const prepareFormId = "prepare-signing";
@@ -12,7 +11,7 @@ const prepareFormId = "prepare-signing";
 type PrepareSigningProps = {
   file: File;
   onCancel: () => void;
-  onContinue?: (values: DocumentDetailsValues) => void;
+  onContinue?: (values: PrepareSigningValues) => void;
 };
 
 export default function PrepareSigning({
@@ -31,7 +30,7 @@ export default function PrepareSigning({
         onCancel={onCancel}
       />
       <div className="flex flex-1 min-h-0 flex-col md:flex-row">
-        <DocumentDetailsForm
+        <PrepareSidebar
           id={prepareFormId}
           defaultDocumentName={file.name}
           onSubmit={(values) => {

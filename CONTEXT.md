@@ -39,3 +39,7 @@ _Avoid_: Note, comment, email body
 **Signer**:
 A person asked to sign the Document in a Signing.
 _Avoid_: Recipient, participant, invitee
+
+**Tax identification number**:
+The Signer's national tax ID used to identify them for signing (for example a Swedish personnummer). Swedish UI label: Personnummer.
+_Avoid_: SSN, personal number, ID number
