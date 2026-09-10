@@ -1,3 +1,7 @@
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
 export type DocumentDetailsValues = {
   documentName: string;
   message: string;
@@ -11,9 +15,6 @@ type DocumentDetailsFormProps = {
 
 const documentNameId = "document-name";
 const messageId = "signing-message";
-
-const fieldClassName =
-  "rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 export default function DocumentDetailsForm({
   id,
@@ -44,42 +45,29 @@ export default function DocumentDetailsForm({
         }}
       >
         <div className="flex flex-col gap-2">
-          <label
-            htmlFor={documentNameId}
-            className="text-sm font-medium text-foreground"
-          >
+          <Label htmlFor={documentNameId}>
             Dokumentnamn{" "}
             <span className="font-normal text-muted-foreground">
               (obligatoriskt)
             </span>
-          </label>
-          <input
+          </Label>
+          <Input
             id={documentNameId}
             name="documentName"
-            type="text"
             required
             defaultValue={defaultDocumentName}
             autoComplete="off"
-            className={fieldClassName}
           />
         </div>
 
         <div className="flex flex-col gap-2">
-          <label
-            htmlFor={messageId}
-            className="text-sm font-medium text-foreground"
-          >
+          <Label htmlFor={messageId}>
             Meddelande{" "}
             <span className="font-normal text-muted-foreground">
               (valfritt)
             </span>
-          </label>
-          <textarea
-            id={messageId}
-            name="message"
-            rows={4}
-            className={`resize-y ${fieldClassName}`}
-          />
+          </Label>
+          <Textarea id={messageId} name="message" rows={4} />
         </div>
       </form>
     </aside>

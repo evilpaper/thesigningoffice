@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 type PrepareToolbarProps = {
   formId: string;
   fieldCount: number;
@@ -23,36 +25,29 @@ export default function PrepareToolbar({
       aria-label="Förbered signering"
       className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4 py-3 sm:px-6"
     >
-      <button
-        type="button"
-        onClick={onCancel}
-        className="cursor-pointer border-0 bg-transparent p-0 text-sm text-foreground"
-      >
+      <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
         Avbryt
-      </button>
+      </Button>
 
       <div className="flex items-center gap-3 text-sm">
         <output className="text-foreground">{fieldStatus}</output>
         <span className="text-border" aria-hidden="true">
           |
         </span>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           disabled={!hasFields}
           title={hasFields ? "Rensa alla fält" : "Inga fält att rensa ännu"}
-          className="cursor-pointer border-0 bg-transparent p-0 text-foreground disabled:cursor-not-allowed disabled:text-muted-foreground"
         >
           Rensa alla
-        </button>
+        </Button>
       </div>
 
-      <button
-        type="submit"
-        form={formId}
-        className="cursor-pointer rounded-md border-0 bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-      >
+      <Button type="submit" form={formId}>
         Nästa
-      </button>
+      </Button>
     </header>
   );
 }
