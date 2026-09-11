@@ -9,8 +9,8 @@ The visual color mode used by the interface, either light or dark.
 _Avoid_: Appearance mode, color scheme
 
 **Theme preference**:
-A user's explicit theme choice that should be reused in later visits.
-_Avoid_: Theme setting, mode preference
+The user's stored choice for how Theme is decided: system, light, or dark. System follows the OS; light and dark lock the Theme. Reused on later visits.
+_Avoid_: Theme setting, mode preference; do not call system a Theme
 
 **Document**:
 The file being signed. It exists only as part of a Signing, not as a standalone library item.

@@ -2,11 +2,14 @@
 // React runs too late — without this, users briefly see the wrong colors on reload.
 // Loaded synchronously from <head> in layout.tsx; only reads localStorage, never writes.
 (() => {
-  var theme;
+  var preference;
   try {
-    theme = localStorage.getItem("theme");
-    if (theme === "light" || theme === "dark") {
-      document.documentElement.dataset.theme = theme;
+    preference = localStorage.getItem("theme");
+    if (preference === "light" || preference === "dark") {
+      document.documentElement.dataset.theme = preference;
+    } else {
+      // "system", missing, or invalid — follow prefers-color-scheme via CSS.
+      document.documentElement.removeAttribute("data-theme");
     }
   } catch (_error) {}
 })();
