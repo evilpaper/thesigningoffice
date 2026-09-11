@@ -103,7 +103,7 @@ export default function Dropzone({
         onDrop={handleDrop}
         className={`
           flex w-full min-h-64 lg:min-h-80 flex-col items-center justify-center gap-3
-          border border-dashed rounded-2xl
+          border border-dashed rounded-lg
           bg-muted p-10 cursor-pointer
           transition-colors duration-200
           ${

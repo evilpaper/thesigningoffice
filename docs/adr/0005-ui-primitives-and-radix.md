@@ -1,6 +1,6 @@
 # UI primitives: semantic HTML + tokens; Radix for complex behavior only
 
-We do not adopt shadcn/ui (CLI, registry, or pasted component kit) as our design system. Shared UI lives in `src/components/ui/`: thin wrappers around semantic HTML styled with our CSS tokens in `globals.css`. Chrome (header, footer, logo, theme) stays at `src/components/` root; feature UI stays in `src/features/<slice>/` (ADR-0001).
+We do not adopt shadcn/ui (CLI, registry, or pasted component kit) as our design system. Shared UI lives in `src/components/ui/`: thin wrappers around semantic HTML styled with our CSS tokens in `token.css` (see ADR-0006). Chrome (header, footer, logo, theme) stays at `src/components/` root; feature UI stays in `src/features/<slice>/` (ADR-0001).
 
 Native elements are the default for anything HTML already does well (`button`, `input`, `textarea`, `label`, and a plain native `select` when options are simple). Radix primitives are used only when interaction needs them: dialog, dropdown/context menu, popover, tooltip, tabs with roving focus, combobox/typeahead, or a custom select that is not a native `<select>`. Never pull in Radix for styling alone. Features import only from `src/components/ui/` — never `@radix-ui/*` directly. Radix-backed wrappers are added on demand; we do not pre-build a catalog.
 

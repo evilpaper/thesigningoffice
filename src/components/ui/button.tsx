@@ -10,7 +10,7 @@ const variantClasses = {
     "border border-border bg-muted text-foreground hover:bg-background",
   ghost: "border-0 bg-transparent text-foreground hover:bg-muted",
   destructive:
-    "border-0 bg-destructive text-primary-foreground hover:opacity-90",
+    "border-0 bg-destructive text-destructive-foreground hover:opacity-90",
 } as const;
 
 const sizeClasses = {
@@ -33,7 +33,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const classes = cn(
-    "inline-flex cursor-pointer items-center justify-center rounded-md font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex cursor-pointer items-center justify-center rounded-md font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50",
     variantClasses[variant],
     sizeClasses[size],
     className,
