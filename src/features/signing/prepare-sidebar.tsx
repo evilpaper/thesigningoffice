@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   type PrepareSigningValues,
   parseSignersFromFormData,
+  validatePrepareSigningValues,
 } from "./prepare-values";
 import SignerList from "./signer-list";
 
@@ -32,28 +33,17 @@ export default function PrepareSidebar({
         onSubmit={(event) => {
           event.preventDefault();
           const formData = new FormData(event.currentTarget);
-          const documentName = String(
-            formData.get("documentName") ?? "",
-          ).trim();
-          const message = String(formData.get("message") ?? "").trim();
-          const signers = parseSignersFromFormData(formData);
+          const result = validatePrepareSigningValues({
+            documentName: String(formData.get("documentName") ?? ""),
+            message: String(formData.get("message") ?? ""),
+            signers: parseSignersFromFormData(formData),
+          });
 
-          if (!documentName || signers.length === 0) {
+          if (!result.ok) {
             return;
           }
 
-          if (
-            signers.some(
-              (signer) =>
-                !signer.name ||
-                !signer.taxIdentificationNumber ||
-                !signer.email,
-            )
-          ) {
-            return;
-          }
-
-          onSubmit({ documentName, message, signers });
+          onSubmit(result.values);
         }}
       >
         <SignerList />
