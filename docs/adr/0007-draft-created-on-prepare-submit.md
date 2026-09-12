@@ -1,0 +1,3 @@
+# Draft Signing is created on prepare submit with Signers
+
+A Draft Signing is created when the preparer submits prepare (“Nästa”), not when a PDF is merely picked for preview. That create includes Document bytes, Document name, optional Message, and Signers in one `createSigning` call. ADR 0004 still owns ports and the file+DB saga; this decision adds `invalidInput` beside its existing failure reasons for prepare/shape failures. The first implementation slice is domain-orchestrator TDD against fake ports — real Postgres and UI/Server Action wire-up come later. Create-on-pick and Document-only create were rejected so Signers are never a second write after a half-formed Draft.
