@@ -60,7 +60,7 @@ export default function ThemeToggle() {
           <label
             key={value}
             className={cn(
-              "inline-flex cursor-pointer items-center justify-center rounded-full p-2 outline-none transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background",
+              "inline-flex cursor-pointer items-center justify-center rounded-full p-2 outline-none transition-colors has-focus-visible:ring-2 has-focus-visible:ring-ring has-focus-visible:ring-offset-2 has-focus-visible:ring-offset-background",
               checked
                 ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground",
