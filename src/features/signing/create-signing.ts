@@ -34,16 +34,35 @@ export async function createSigning(input: {
     return prepared;
   }
 
-  const documentKey = createDocumentKey(input.signingId, input.fileName);
-  await input.documentStore.store({ bytes: input.bytes, key: documentKey });
+  if (input.bytes.length === 0) {
+    return { ok: false, reason: "invalidDocument" };
+  }
 
-  await input.signingRepository.create({
-    signingId: input.signingId,
-    documentName: prepared.values.documentName,
-    message: prepared.values.message,
-    signers: prepared.values.signers,
-    documentKey,
-  });
+  const documentKey = createDocumentKey(input.signingId, input.fileName);
+
+  try {
+    await input.documentStore.store({ bytes: input.bytes, key: documentKey });
+  } catch {
+    return { ok: false, reason: "storageFailed" };
+  }
+
+  try {
+    await input.signingRepository.create({
+      signingId: input.signingId,
+      documentName: prepared.values.documentName,
+      message: prepared.values.message,
+      signers: prepared.values.signers,
+      documentKey,
+    });
+  } catch {
+    try {
+      await input.documentStore.delete(documentKey);
+    } catch {
+      return { ok: false, reason: "storageFailed" };
+    }
+
+    return { ok: false, reason: "databaseUnavailable" };
+  }
 
   return { ok: true, signingId: input.signingId };
 }
