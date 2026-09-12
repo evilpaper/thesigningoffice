@@ -1,0 +1,29 @@
+---
+description: Conventional Commits style; no Cursor Co-authored-by trailer
+alwaysApply: true
+---
+
+# Git commits
+
+When creating or amending commits in this repo (including research and docs):
+
+- Use **Conventional Commits** matching `git log`: `type(scope): subject`
+- Common types here: `feat`, `fix`, `refactor`, `docs`, `build`, `test`
+- Prefer a **scope** when one is clear (`prepare-signing`, `theme`, `adr`, `research`)
+- Subject: imperative, concise; optional body for why — not a second title
+- Research write-ups use `docs(research): …`
+- ADRs use `docs(adr): …`
+- **Never** add `Co-authored-by: Cursor` / `cursoragent@cursor.com` (or any Cursor attribution trailer). If tooling injects it, strip it before finishing the commit.
+
+```text
+# ❌ BAD
+Document prepare and createSigning seams for issue #2.
+
+Co-authored-by: Cursor <cursoragent@cursor.com>
+
+# ✅ GOOD
+docs(research): inventory prepare and createSigning seams
+
+# ✅ GOOD
+feat(prepare-toolbar): add arrow left icon to back button
+```

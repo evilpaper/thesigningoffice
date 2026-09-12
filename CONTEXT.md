@@ -21,7 +21,7 @@ The human-facing name of the Document.
 _Avoid_: Document title, filename, title
 
 **Signing**:
-A case of collecting signatures on one Document. It exists from the moment the Document is submitted, including before anyone has been asked to sign.
+A case of collecting signatures on one Document. It exists from the moment the Document is submitted — when the preparer confirms the Document together with its Signers (prepare complete), not merely when a file is picked for preview — including before anyone has been asked to sign.
 _Avoid_: Upload, job, session, signing request
 
 **Draft**:
