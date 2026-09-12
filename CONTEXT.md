@@ -2,6 +2,8 @@
 
 Core language for user-facing concepts in The Signing Office product.
 
+**Story**: A preparer chooses a Document, enters Document name, optional Message, and Signers, then submits prepare. That creates a Signing in Draft that owns the Document and those Signers.
+
 ## Language
 
 **Theme**:

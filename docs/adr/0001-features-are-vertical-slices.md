@@ -1,7 +1,5 @@
 # Features are vertical slices; app is routes only
 
-Next.js defaults to colocating UI next to routes. We are not doing that. `src/app/` owns routes and nothing else. `src/components/` owns shared chrome (header, footer, logo, theme). `src/infrastructure/` owns port implementations (persistence, external I/O). Each product capability lives in `src/features/<name>/` as a vertical slice: its UI and its Server Functions together.
+The preparer’s prepare form and the server call that saves a Draft live together in `src/features/signing/`. `src/app/` is routes only; `src/components/` is shared chrome; `src/infrastructure/` is Postgres and object-storage adapters. Signing is the first slice — there is no separate documents feature. Keep a slice flat (no `ui/` / `model/` folders, no barrel) until a second kind of file appears.
 
-Signing is the first slice. `/` is the Signing entry point. The route imports `StartSigningFlow` from `src/features/signing/` and keeps only the `<main>` page shell (max-width, padding). `StartSigningFlow` owns idle → preparing UI state: idle shows `StartSigningLanding` (copy + `DocumentPicker`); preparing shows `PrepareSigning` (Document ready for signature prep). The Server Function is `startSigning` in the same folder — it starts a Draft Signing that owns a Document; there is no separate `features/documents/` slice. Keep a slice flat until a second kind of file actually appears — no `ui/` / `actions/` / `model/` folders and no barrel file up front.
-
-Colocating in `app/` was rejected because routes would accumulate product UI. Splitting feature UI into `components/` and feature logic into `features/` was rejected because the flow UI and `startSigning` would live apart and invite a fake `ui`/`api` split to compensate.
+Colocating product UI in `app/` was rejected. Splitting feature UI into `components/` and logic into `features/` was rejected — the form and its save path would drift apart.

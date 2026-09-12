@@ -1,7 +1,5 @@
-# Vitest beside features; Playwright in e2e/
+# Vitest for the save path; Playwright for the form journey
 
-Unit tests use Vitest and live next to the code under test (e.g. `src/features/signing/create-signing.test.ts`). End-to-end tests use Playwright and live under `e2e/` at the repo root — outside `src/` and outside feature slices. Vitest targets domain orchestrators with injected port fakes — no `FormData`, no Drizzle, no jsdom or React renderer; see ADR 0004. Repository integration tests may use real Postgres (Docker in CI). Playwright covers React, the DOM, full user journeys, `useActionState` feedback, and async Server Functions that need a real server.
+Vitest sits next to pure logic (`createSigning`, prepare validation) with fake ports — no FormData, React, or Drizzle. Playwright under `e2e/` covers prepare form → server → UI feedback. Repository checks against real Postgres (Docker in CI) are allowed when the real adapter lands.
 
-Run them with `pnpm test` (Vitest watch), `pnpm test:run` (Vitest once, for CI), and `pnpm test:e2e` (Playwright). E2e starts the dev server via Playwright `webServer` and uses `baseURL` `http://localhost:3000`.
-
-Putting e2e specs inside `features/` was rejected: they exercise the whole app, not one slice. A top-level `tests/` folder mixing unit and e2e was rejected: the split between fast colocated tests and browser tests should stay obvious. Adding jsdom and React Testing Library to Vitest was rejected: Playwright already covers UI; Vitest stays a thin layer for pure domain and server-side logic.
+`pnpm test` / `pnpm test:run` / `pnpm test:e2e`. E2e in `features/` or a mixed top-level `tests/` was rejected. jsdom/RTL in Vitest was rejected — Playwright owns the UI.

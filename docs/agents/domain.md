@@ -2,9 +2,13 @@
 
 How the engineering skills should consume this repo's domain documentation when exploring the codebase.
 
+## System story
+
+The preparer fills prepare in the UI; submit sends the values to the server; `createSigning` stores Document bytes in object storage and Signing metadata (including Signers) in Postgres as a Draft. Everything else (slices, ports, Vitest fakes, compensating file delete) exists to keep that path clear and testable.
+
 ## Before exploring, read these
 
-- **`CONTEXT.md`** at the repo root, or
+- **System story** above, then **`CONTEXT.md`** at the repo root (glossary + product story), or
 - **`CONTEXT-MAP.md`** at the repo root if it exists — it points at one `CONTEXT.md` per context. Read each one relevant to the topic.
 - **`docs/adr/`** — read ADRs that touch the area you're about to work in. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
 

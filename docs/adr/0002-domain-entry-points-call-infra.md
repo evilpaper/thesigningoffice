@@ -1,5 +1,5 @@
-# Domain entry points call infra; Test and Prod share code
+# Server Action is thin; createSigning owns the save
 
-UI and Server Functions use product language (`startSigning`, Document, Signing). The Server Action is a thin adapter; domain orchestration (e.g. `createSigning`) sits in the same feature slice and calls persistence through ports — see ADR 0004. Infrastructure implementations live in `src/infrastructure/`: Postgres (Drizzle) for Signing state, local disk or an object bucket for Document bytes — not via a `features/documents/` slice and not named `uploadToS3` / `saveFile` on the form. Test and Prod are the same code with different env (database URL, bucket, secrets).
+Prepare submit hits a thin Server Action that parses the form and calls `createSigning`. That orchestrator persists Document bytes (object store) and Signing metadata including Signers (Postgres). Naming and folders stay in product language — not `uploadToS3` / `saveFile`, and not a peer `features/documents/` slice. Test and Prod run the same code with different env (database URL, bucket, secrets).
 
-Naming the form action after storage, putting upload/bucket code in a peer feature folder, or forking Test vs Prod code paths were rejected: they make the product look like a file pipeline and duplicate the slice.
+Storage-named form actions, a separate documents feature, or Test-only code paths were rejected.
