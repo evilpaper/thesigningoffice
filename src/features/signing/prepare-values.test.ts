@@ -96,4 +96,50 @@ describe("validatePrepareSigningValues", () => {
       values: { ...validValues(), message: "" },
     });
   });
+
+  it("rejects a Signer email that is not a simple email shape", () => {
+    const result = validatePrepareSigningValues({
+      ...validValues(),
+      signers: [
+        {
+          name: "Ada Lovelace",
+          taxIdentificationNumber: "198001011234",
+          email: "not-an-email",
+        },
+      ],
+    });
+
+    expect(result).toEqual({ ok: false, reason: "invalidInput" });
+  });
+
+  it("rejects more than eight Signers", () => {
+    const result = validatePrepareSigningValues({
+      ...validValues(),
+      signers: Array.from({ length: 9 }, (_, index) => ({
+        name: `Signer ${index + 1}`,
+        taxIdentificationNumber: "198001011234",
+        email: `signer${index + 1}@example.com`,
+      })),
+    });
+
+    expect(result).toEqual({ ok: false, reason: "invalidInput" });
+  });
+
+  it("accepts eight Signers", () => {
+    const signers = Array.from({ length: 8 }, (_, index) => ({
+      name: `Signer ${index + 1}`,
+      taxIdentificationNumber: "198001011234",
+      email: `signer${index + 1}@example.com`,
+    }));
+
+    const result = validatePrepareSigningValues({
+      ...validValues(),
+      signers,
+    });
+
+    expect(result).toEqual({
+      ok: true,
+      values: { ...validValues(), signers },
+    });
+  });
 });

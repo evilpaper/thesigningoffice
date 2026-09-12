@@ -1,16 +1,27 @@
+import { z } from "zod";
+
 export const MAX_SIGNERS = 8;
 
-export type Signer = {
-  name: string;
-  taxIdentificationNumber: string;
-  email: string;
-};
+const signerEmail = z
+  .string()
+  .trim()
+  .regex(/[^\s@]+@[^\s@]+\.[^\s@]+/);
 
-export type PrepareSigningValues = {
-  documentName: string;
-  message: string;
-  signers: Signer[];
-};
+const signerSchema = z.object({
+  name: z.string().trim().min(1),
+  taxIdentificationNumber: z.string().trim().min(1),
+  email: signerEmail,
+});
+
+export const prepareSigningValuesSchema = z.object({
+  documentName: z.string().trim().min(1),
+  message: z.string().trim(),
+  signers: z.array(signerSchema).min(1).max(MAX_SIGNERS),
+});
+
+export type Signer = z.infer<typeof signerSchema>;
+
+export type PrepareSigningValues = z.infer<typeof prepareSigningValuesSchema>;
 
 export type ValidatePrepareSigningResult =
   | { ok: true; values: PrepareSigningValues }
@@ -19,28 +30,13 @@ export type ValidatePrepareSigningResult =
 export function validatePrepareSigningValues(
   input: PrepareSigningValues,
 ): ValidatePrepareSigningResult {
-  const documentName = input.documentName.trim();
-  const message = input.message.trim();
-  const signers = input.signers.map((signer) => ({
-    name: signer.name.trim(),
-    taxIdentificationNumber: signer.taxIdentificationNumber.trim(),
-    email: signer.email.trim(),
-  }));
+  const result = prepareSigningValuesSchema.safeParse(input);
 
-  if (!documentName || signers.length === 0) {
+  if (!result.success) {
     return { ok: false, reason: "invalidInput" };
   }
 
-  if (
-    signers.some(
-      (signer) =>
-        !signer.name || !signer.taxIdentificationNumber || !signer.email,
-    )
-  ) {
-    return { ok: false, reason: "invalidInput" };
-  }
-
-  return { ok: true, values: { documentName, message, signers } };
+  return { ok: true, values: result.data };
 }
 
 export function parseSignersFromFormData(formData: FormData): Signer[] {
