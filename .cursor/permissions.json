@@ -1,0 +1,11 @@
+{
+  "terminalAllowlist": ["gh"],
+  "autoRun": {
+    "allow_instructions": [
+      "Allow GitHub CLI (gh) for reading issues/PRs, commenting, labeling, and creating issues or PRs in this repo."
+    ],
+    "block_instructions": [
+      "Require approval for destructive GitHub CLI actions such as force-push, deleting branches/repos, or closing issues/PRs unless the user clearly asked for that."
+    ]
+  }
+}
