@@ -14,8 +14,8 @@ Primary sources: feature code under `src/features/signing/`, `src/infrastructure
 | Symbol | Shape |
 |--------|--------|
 | `MAX_SIGNERS` | `8` |
-| `SignerDraft` | `{ name: string; taxIdentificationNumber: string; email: string }` |
-| `PrepareSigningValues` | `{ documentName: string; message: string; signers: SignerDraft[] }` |
+| `Signer` | `{ name: string; taxIdentificationNumber: string; email: string }` |
+| `PrepareSigningValues` | `{ documentName: string; message: string; signers: Signer[] }` |
 
 `parseSignersFromFormData(formData)` reads indexed fields `signers.{i}.name|taxIdentificationNumber|email` until a missing `name` key, capping at `MAX_SIGNERS`. Values are `String(...).trim()`.
 
@@ -121,7 +121,7 @@ Single Vitest case: fake `DocumentStore`; asserts `store` called with key `docum
 | Document bytes / file | `startSigning` FormData `"document"`; `createSigning` `bytes` + `fileName` | Wired for create; prepare UI holds `File` in client state only (`StartSigningFlow`) and does not call `startSigning`. |
 | Document name | `PrepareSigningValues.documentName`; default `file.name` | **Not** in `createSigning` input; create uses upload `fileName` only for storage key extension via `createDocumentKey`. |
 | Message | `PrepareSigningValues.message` (optional) | **Not** in `createSigning` / `startSigning`. |
-| Signers | `PrepareSigningValues.signers` / `SignerDraft` | **Not** in `createSigning` / `startSigning`. |
+| Signers | `PrepareSigningValues.signers` / `Signer` | **Not** in `createSigning` / `startSigning`. |
 | Signing DB row (Draft) | ADR 0004 + CONTEXT Draft | **No** `SigningRepository`; create only stores bytes. |
 | Failure reasons beyond invalid file | ADR 0004 union | Action has `invalidDocument` only; orchestrator never returns `ok: false`. |
 
@@ -173,7 +173,7 @@ A Signing does not exist until step 3 commits. Orphan files only briefly between
 
 | Extension | Location | Notes |
 |-----------|----------|--------|
-| Widen prepare → create data | Types in `prepare-values.ts` (`PrepareSigningValues`, `SignerDraft`) are the UI contract to carry forward; do not redefine Signers from scratch. |
+| Widen prepare → create data | Types in `prepare-values.ts` (`PrepareSigningValues`, `Signer`) are the UI contract to carry forward; do not redefine Signers from scratch. |
 | Widen orchestrator input / saga | `createSigning` in `create-signing.ts` — add metadata (document name, message, signers) + inject `SigningRepository`; implement ADR 0004 steps 3–4 (compensate with `documentStore.delete`). |
 | New port | Introduce `SigningRepository` (with `create` as named in ADR 0004); when both ports exist, consider extracting to `src/features/signing/ports.ts` per comment in `create-signing.ts`. |
 | Infra | New `src/infrastructure/db/` (ADR 0002 / 0004); keep `documentStore` in `src/infrastructure/document.ts`. |

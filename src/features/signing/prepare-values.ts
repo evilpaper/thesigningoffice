@@ -1,6 +1,6 @@
 export const MAX_SIGNERS = 8;
 
-export type SignerDraft = {
+export type Signer = {
   name: string;
   taxIdentificationNumber: string;
   email: string;
@@ -9,11 +9,11 @@ export type SignerDraft = {
 export type PrepareSigningValues = {
   documentName: string;
   message: string;
-  signers: SignerDraft[];
+  signers: Signer[];
 };
 
-export function parseSignersFromFormData(formData: FormData): SignerDraft[] {
-  const signers: SignerDraft[] = [];
+export function parseSignersFromFormData(formData: FormData): Signer[] {
+  const signers: Signer[] = [];
 
   for (let index = 0; index < MAX_SIGNERS; index += 1) {
     const nameValue = formData.get(`signers.${index}.name`);
