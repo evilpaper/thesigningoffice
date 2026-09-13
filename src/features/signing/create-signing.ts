@@ -7,11 +7,12 @@ export type CreateSigningResult =
   | { ok: true; signingId: string }
   | {
       ok: false;
-      reason:
-        | "invalidDocument"
-        | "invalidInput"
-        | "databaseUnavailable"
-        | "storageFailed";
+      reason: "invalidDocument" | "invalidInput" | "storageFailed";
+    }
+  | {
+      ok: false;
+      reason: "databaseUnavailable";
+      documentOrphaned: boolean;
     };
 
 export async function createSigning(input: {
@@ -58,10 +59,18 @@ export async function createSigning(input: {
     try {
       await input.documentStore.delete(documentKey);
     } catch {
-      return { ok: false, reason: "storageFailed" };
+      return {
+        ok: false,
+        reason: "databaseUnavailable",
+        documentOrphaned: true,
+      };
     }
 
-    return { ok: false, reason: "databaseUnavailable" };
+    return {
+      ok: false,
+      reason: "databaseUnavailable",
+      documentOrphaned: false,
+    };
   }
 
   return { ok: true, signingId: input.signingId };

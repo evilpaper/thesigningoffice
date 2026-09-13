@@ -144,10 +144,14 @@ describe("createSigning", () => {
     const result = await createSigning(validInput(ports));
 
     expect(ports.documentStore.delete).toHaveBeenCalledWith(documentKey);
-    expect(result).toEqual({ ok: false, reason: "databaseUnavailable" });
+    expect(result).toEqual({
+      ok: false,
+      reason: "databaseUnavailable",
+      documentOrphaned: false,
+    });
   });
 
-  it("returns storageFailed when compensating delete fails after repository create fails", async () => {
+  it("returns databaseUnavailable with documentOrphaned when compensating delete fails", async () => {
     const ports = fakePorts({
       create: vi.fn().mockRejectedValue(new Error("postgres down")),
       delete: vi.fn().mockRejectedValue(new Error("delete failed")),
@@ -156,6 +160,10 @@ describe("createSigning", () => {
     const result = await createSigning(validInput(ports));
 
     expect(ports.documentStore.delete).toHaveBeenCalledWith(documentKey);
-    expect(result).toEqual({ ok: false, reason: "storageFailed" });
+    expect(result).toEqual({
+      ok: false,
+      reason: "databaseUnavailable",
+      documentOrphaned: true,
+    });
   });
 });
