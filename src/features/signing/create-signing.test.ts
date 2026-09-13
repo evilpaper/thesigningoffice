@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { createSigning } from "./create-signing";
+import {
+  type CreateSigningCommand,
+  type CreateSigningPorts,
+  createSigning,
+} from "./create-signing";
 import type { Signer } from "./prepare-values";
 
 /**
@@ -19,56 +23,63 @@ const signers: Signer[] = [
   },
 ];
 
+type FakePorts = CreateSigningPorts & {
+  documentStore: {
+    store: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
+  signingRepository: {
+    create: ReturnType<typeof vi.fn>;
+  };
+};
+
 function fakePorts(overrides?: {
   store?: ReturnType<typeof vi.fn>;
   delete?: ReturnType<typeof vi.fn>;
   create?: ReturnType<typeof vi.fn>;
-}) {
-  const documentStore = {
-    store:
-      overrides?.store ??
-      vi.fn(async (_input: { bytes: Uint8Array; key: string }) => {}),
-    delete: overrides?.delete ?? vi.fn(async (_key: string) => {}),
-  };
-  const signingRepository = {
-    create:
-      overrides?.create ??
-      vi.fn(
-        async (_input: {
-          signingId: string;
-          documentName: string;
-          message: string;
-          signers: Signer[];
-          documentKey: string;
-        }) => {},
-      ),
-  };
-
-  return { documentStore, signingRepository };
+}): FakePorts {
+  return {
+    documentStore: {
+      store:
+        overrides?.store ??
+        vi.fn(async (_input: { bytes: Uint8Array; key: string }) => {}),
+      delete: overrides?.delete ?? vi.fn(async (_key: string) => {}),
+    },
+    signingRepository: {
+      create:
+        overrides?.create ??
+        vi.fn(
+          async (_input: {
+            signingId: string;
+            documentName: string;
+            message: string;
+            signers: Signer[];
+            documentKey: string;
+          }) => {},
+        ),
+    },
+  } as FakePorts;
 }
 
-function validInput(
-  ports: ReturnType<typeof fakePorts>,
+function validCommand(
   overrides?: Partial<{
     bytes: Uint8Array;
     documentName: string;
     message: string;
     signers: Signer[];
   }>,
-) {
+): CreateSigningCommand {
   return {
     signingId,
-    bytes,
-    fileName: "contract.pdf",
-    documentName: "Employment contract",
-    message: "Please sign",
-    signers,
-    ...overrides,
-    documentStore: ports.documentStore,
-    signingRepository: ports.signingRepository,
-  } as Parameters<typeof createSigning>[0] & {
-    documentStore: typeof ports.documentStore;
-    signingRepository: typeof ports.signingRepository;
+    document: {
+      bytes: overrides?.bytes ?? bytes,
+      fileName: "contract.pdf",
+    },
+    values: {
+      documentName: overrides?.documentName ?? "Employment contract",
+      message: overrides?.message ?? "Please sign",
+      signers: overrides?.signers ?? signers,
+    },
   };
 }
 
@@ -76,7 +87,7 @@ describe("createSigning", () => {
   it("stores Document bytes then creates Signing metadata with documentKey", async () => {
     const ports = fakePorts();
 
-    const result = await createSigning(validInput(ports));
+    const result = await createSigning(validCommand(), ports);
 
     expect(ports.documentStore.store).toHaveBeenCalledWith({
       bytes,
@@ -102,7 +113,8 @@ describe("createSigning", () => {
     const ports = fakePorts();
 
     const result = await createSigning(
-      validInput(ports, { documentName: "   ", signers }),
+      validCommand({ documentName: "   ", signers }),
+      ports,
     );
 
     expect(result).toEqual({ ok: false, reason: "invalidInput" });
@@ -115,7 +127,8 @@ describe("createSigning", () => {
     const ports = fakePorts();
 
     const result = await createSigning(
-      validInput(ports, { bytes: new Uint8Array() }),
+      validCommand({ bytes: new Uint8Array() }),
+      ports,
     );
 
     expect(result).toEqual({ ok: false, reason: "invalidDocument" });
@@ -129,7 +142,7 @@ describe("createSigning", () => {
       store: vi.fn().mockRejectedValue(new Error("disk full")),
     });
 
-    const result = await createSigning(validInput(ports));
+    const result = await createSigning(validCommand(), ports);
 
     expect(result).toEqual({ ok: false, reason: "storageFailed" });
     expect(ports.signingRepository.create).not.toHaveBeenCalled();
@@ -141,7 +154,7 @@ describe("createSigning", () => {
       create: vi.fn().mockRejectedValue(new Error("postgres down")),
     });
 
-    const result = await createSigning(validInput(ports));
+    const result = await createSigning(validCommand(), ports);
 
     expect(ports.documentStore.delete).toHaveBeenCalledWith(documentKey);
     expect(result).toEqual({
@@ -157,7 +170,7 @@ describe("createSigning", () => {
       delete: vi.fn().mockRejectedValue(new Error("delete failed")),
     });
 
-    const result = await createSigning(validInput(ports));
+    const result = await createSigning(validCommand(), ports);
 
     expect(ports.documentStore.delete).toHaveBeenCalledWith(documentKey);
     expect(result).toEqual({

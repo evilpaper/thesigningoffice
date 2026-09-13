@@ -1,7 +1,21 @@
 import { createDocumentKey } from "@/infrastructure/document";
 import type { DocumentStore, SigningRepository } from "./ports";
-import type { Signer } from "./prepare-values";
+import type { PrepareSigningValues } from "./prepare-values";
 import { validatePrepareSigningValues } from "./prepare-values";
+
+export type CreateSigningCommand = {
+  signingId: string;
+  document: {
+    bytes: Uint8Array;
+    fileName: string;
+  };
+  values: PrepareSigningValues;
+};
+
+export type CreateSigningPorts = {
+  documentStore: DocumentStore;
+  signingRepository: SigningRepository;
+};
 
 export type CreateSigningResult =
   | { ok: true; signingId: string }
@@ -15,41 +29,37 @@ export type CreateSigningResult =
       documentOrphaned: boolean;
     };
 
-export async function createSigning(input: {
-  signingId: string;
-  bytes: Uint8Array;
-  fileName: string;
-  documentName: string;
-  message: string;
-  signers: Signer[];
-  documentStore: DocumentStore;
-  signingRepository: SigningRepository;
-}): Promise<CreateSigningResult> {
-  const prepared = validatePrepareSigningValues({
-    documentName: input.documentName,
-    message: input.message,
-    signers: input.signers,
-  });
+export async function createSigning(
+  command: CreateSigningCommand,
+  ports: CreateSigningPorts,
+): Promise<CreateSigningResult> {
+  const prepared = validatePrepareSigningValues(command.values);
 
   if (!prepared.ok) {
     return prepared;
   }
 
-  if (input.bytes.length === 0) {
+  if (command.document.bytes.length === 0) {
     return { ok: false, reason: "invalidDocument" };
   }
 
-  const documentKey = createDocumentKey(input.signingId, input.fileName);
+  const documentKey = createDocumentKey(
+    command.signingId,
+    command.document.fileName,
+  );
 
   try {
-    await input.documentStore.store({ bytes: input.bytes, key: documentKey });
+    await ports.documentStore.store({
+      bytes: command.document.bytes,
+      key: documentKey,
+    });
   } catch {
     return { ok: false, reason: "storageFailed" };
   }
 
   try {
-    await input.signingRepository.create({
-      signingId: input.signingId,
+    await ports.signingRepository.create({
+      signingId: command.signingId,
       documentName: prepared.values.documentName,
       message: prepared.values.message,
       signers: prepared.values.signers,
@@ -57,7 +67,7 @@ export async function createSigning(input: {
     });
   } catch {
     try {
-      await input.documentStore.delete(documentKey);
+      await ports.documentStore.delete(documentKey);
     } catch {
       return {
         ok: false,
@@ -73,5 +83,5 @@ export async function createSigning(input: {
     };
   }
 
-  return { ok: true, signingId: input.signingId };
+  return { ok: true, signingId: command.signingId };
 }

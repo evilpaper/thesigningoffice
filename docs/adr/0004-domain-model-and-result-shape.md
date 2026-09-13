@@ -1,6 +1,6 @@
 # createSigning: ports, typed results, file then Postgres
 
-`createSigning` is the save: validate plain input, write Document bytes via `DocumentStore`, insert Signing metadata (Draft by default) via `SigningRepository`. It does not import Next.js, React, or Drizzle. The Server Action only adapts FormData / `revalidatePath`. Ports are injected; implementations live in `src/infrastructure/`.
+`createSigning` is the save: validate a `CreateSigningCommand` (signing id, document bytes/file name, prepare values), write Document bytes via `DocumentStore`, insert Signing metadata (Draft by default) via `SigningRepository`. It does not import Next.js, React, or Drizzle. The Server Action only adapts FormData / `revalidatePath`. Ports are a second argument; implementations live in `src/infrastructure/`.
 
 Expected failures return a closed union — not `throw`:
 

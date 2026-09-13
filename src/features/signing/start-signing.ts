@@ -32,16 +32,18 @@ export async function startSigning(
 
   // Pick-to-create is not the product path (ADR 0007). Without prepare Signers
   // this fails validation; full Nästa → createSigning wire-up is out of scope.
-  const result = await createSigning({
-    signingId,
-    bytes: buffer,
-    fileName: document.name,
-    documentName: document.name,
-    message: "",
-    signers: [],
-    documentStore,
-    signingRepository: stubSigningRepository,
-  });
+  const result = await createSigning(
+    {
+      signingId,
+      document: { bytes: buffer, fileName: document.name },
+      values: {
+        documentName: document.name,
+        message: "",
+        signers: [],
+      },
+    },
+    { documentStore, signingRepository: stubSigningRepository },
+  );
 
   if (result.ok) {
     revalidatePath("/");
