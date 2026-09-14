@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ChromeProvider } from "@/components/chrome";
-import Footer from "@/components/footer";
 import Header from "@/components/header";
 
 const geistSans = Geist({
@@ -13,7 +11,6 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -33,11 +30,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script src="/theme-init.js" />
       </head>
       <body className="min-h-full flex flex-col">
-        <ChromeProvider>
-          <Header />
-          {children}
-          <Footer />
-        </ChromeProvider>
+        <Header />
+        {children}
       </body>
     </html>
   );
