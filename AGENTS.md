@@ -8,6 +8,15 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+## Prefer Next.js and React
+
+This app is small. Stay on App Router and React as documented. Do not invent architecture, providers, or vocabulary to glue screens together.
+
+- Before adding a file, provider, or context: can this be a `page`, nested `layout`, route group, or a component imported where it is used? If yes, do that.
+- Root `layout.tsx` is only what appears on every screen. If a screen needs different shell UI, render that UI in the page or nested layout — do not toggle layout siblings with a context.
+- Names come from `CONTEXT.md` or from Next.js/React (`layout`, `page`, `error`, `not-found`). A new noun for a module is a smell; do not mint one.
+- A context (or provider) for one boolean used by two files is not a layer. Render the component in the branch that needs it.
+
 ## Agent skills
 
 ### Issue tracker
