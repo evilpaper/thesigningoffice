@@ -2,13 +2,11 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type PrepareToolbarProps = {
-  formId: string;
   fieldCount: number;
   onCancel: () => void;
 };
 
 export default function PrepareToolbar({
-  formId,
   fieldCount,
   onCancel,
 }: PrepareToolbarProps) {
@@ -53,9 +51,7 @@ export default function PrepareToolbar({
         </Button>
       </div>
 
-      <Button type="submit" form={formId}>
-        Nästa
-      </Button>
+      <Button type="submit">Nästa</Button>
     </header>
   );
 }
