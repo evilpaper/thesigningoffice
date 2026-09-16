@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createSigningAction } from "./create-signing-action";
 import PrepareSigningContent from "./prepare-signing-content";
 import PrepareSigningHeader from "./prepare-signing-header";
 import {
@@ -24,7 +25,7 @@ export default function PrepareSigning({
   const [taxIdentificationNumberErrors, setTaxIdentificationNumberErrors] =
     useState<Readonly<Record<number, TaxIdentificationNumberErrorCode>>>({});
 
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
@@ -48,7 +49,13 @@ export default function PrepareSigning({
       return;
     }
 
-    console.log("Yay, we're good to go!");
+    /**
+     * The PDF lives in the document prop, not in the form. FormData(event.currentTarget) only has the text fields.
+     */
+    formData.set("document", document);
+    const result = await createSigningAction(formData);
+
+    console.log("createSigningAction result:", result);
   };
 
   if (!documentUrl) {
