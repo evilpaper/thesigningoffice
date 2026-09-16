@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizeSwedishTaxIdentificationNumber } from "./swedish-tax-identification-number";
 
 export const MAX_SIGNERS = 8;
 
@@ -7,9 +8,21 @@ const signerEmail = z
   .trim()
   .regex(/[^\s@]+@[^\s@]+\.[^\s@]+/);
 
+const swedishTaxIdentificationNumber = z
+  .string()
+  .trim()
+  .transform((value, ctx) => {
+    const normalized = normalizeSwedishTaxIdentificationNumber(value);
+    if (normalized == null) {
+      ctx.addIssue({ code: "custom" });
+      return z.NEVER;
+    }
+    return normalized;
+  });
+
 const signerSchema = z.object({
   name: z.string().trim().min(1),
-  taxIdentificationNumber: z.string().trim().min(1),
+  taxIdentificationNumber: swedishTaxIdentificationNumber,
   email: signerEmail,
 });
 

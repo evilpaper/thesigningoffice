@@ -42,7 +42,8 @@ export default function SignerList() {
       <ul className="flex flex-col gap-4">
         {rows.map((row, index) => {
           const nameId = `${listId}-${row.id}-name`;
-          const taxId = `${listId}-${row.id}-tax`;
+          const taxIdentificationNumberId = `${listId}-${row.id}-taxIdentificationNumber`;
+          const taxIdentificationNumberHintId = `${taxIdentificationNumberId}-hint`;
           const emailId = `${listId}-${row.id}-email`;
           const heading = `Undertecknare ${index + 1}`;
 
@@ -84,14 +85,24 @@ export default function SignerList() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor={taxId}>Personnummer</Label>
+                <Label htmlFor={taxIdentificationNumberId}>Personnummer</Label>
                 <Input
-                  id={taxId}
+                  id={taxIdentificationNumberId}
                   name={`signers.${index}.taxIdentificationNumber`}
                   required
                   autoComplete="off"
                   inputMode="numeric"
+                  spellCheck={false}
+                  autoCorrect="off"
+                  aria-describedby={taxIdentificationNumberHintId}
+                  placeholder="ÅÅÅÅMMDD-NNNN"
                 />
+                <p
+                  id={taxIdentificationNumberHintId}
+                  className="text-sm text-muted-foreground"
+                >
+                  Svenskt personnummer eller samordningsnummer.
+                </p>
               </div>
 
               <div className="flex flex-col gap-2">

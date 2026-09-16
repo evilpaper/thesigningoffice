@@ -44,4 +44,4 @@ _Avoid_: Recipient, participant, invitee
 
 **Tax identification number**:
 The Signer's national tax ID used to identify them for signing (for example a Swedish personnummer). Swedish UI label: Personnummer.
-_Avoid_: SSN, personal number, ID number
+_Avoid_: SSN, personal number, ID number, tin, taxId

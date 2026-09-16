@@ -18,7 +18,7 @@ const bytes = new Uint8Array([1, 2, 3]);
 const signers: Signer[] = [
   {
     name: "Ada Lovelace",
-    taxIdentificationNumber: "198001011234",
+    taxIdentificationNumber: "198001011231",
     email: "ada@example.com",
   },
 ];
