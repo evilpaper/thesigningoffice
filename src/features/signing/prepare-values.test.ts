@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   type PrepareSigningValues,
+  selectTaxIdentificationNumberErrorsBySigner,
   validatePrepareSigningValues,
 } from "./prepare-values";
 
@@ -79,7 +80,11 @@ describe("validatePrepareSigningValues", () => {
       documentName: "   ",
     });
 
-    expect(result).toEqual({ ok: false, reason: "invalidInput" });
+    expect(result).toEqual({
+      ok: false,
+      reason: "invalidInput",
+      fieldErrors: [{ path: "documentName", code: "invalidInput" }],
+    });
   });
 
   it("rejects when there are no Signers", () => {
@@ -88,7 +93,11 @@ describe("validatePrepareSigningValues", () => {
       signers: [],
     });
 
-    expect(result).toEqual({ ok: false, reason: "invalidInput" });
+    expect(result).toEqual({
+      ok: false,
+      reason: "invalidInput",
+      fieldErrors: [{ path: "signers", code: "invalidInput" }],
+    });
   });
 
   it("rejects when any Signer field is blank", () => {
@@ -103,7 +112,16 @@ describe("validatePrepareSigningValues", () => {
       ],
     });
 
-    expect(result).toEqual({ ok: false, reason: "invalidInput" });
+    expect(result).toEqual({
+      ok: false,
+      reason: "invalidInput",
+      fieldErrors: [
+        {
+          path: "signers.0.taxIdentificationNumber",
+          code: "invalidSwedishTaxIdentificationNumber",
+        },
+      ],
+    });
   });
 
   it("rejects a Tax identification number that fails Swedish validation", () => {
@@ -118,7 +136,16 @@ describe("validatePrepareSigningValues", () => {
       ],
     });
 
-    expect(result).toEqual({ ok: false, reason: "invalidInput" });
+    expect(result).toEqual({
+      ok: false,
+      reason: "invalidInput",
+      fieldErrors: [
+        {
+          path: "signers.0.taxIdentificationNumber",
+          code: "invalidSwedishTaxIdentificationNumber",
+        },
+      ],
+    });
   });
 
   it("allows an empty Message", () => {
@@ -145,7 +172,11 @@ describe("validatePrepareSigningValues", () => {
       ],
     });
 
-    expect(result).toEqual({ ok: false, reason: "invalidInput" });
+    expect(result).toEqual({
+      ok: false,
+      reason: "invalidInput",
+      fieldErrors: [{ path: "signers.0.email", code: "invalidInput" }],
+    });
   });
 
   it("rejects more than eight Signers", () => {
@@ -158,7 +189,11 @@ describe("validatePrepareSigningValues", () => {
       })),
     });
 
-    expect(result).toEqual({ ok: false, reason: "invalidInput" });
+    expect(result).toEqual({
+      ok: false,
+      reason: "invalidInput",
+      fieldErrors: [{ path: "signers", code: "invalidInput" }],
+    });
   });
 
   it("accepts eight Signers", () => {
@@ -213,6 +248,28 @@ describe("validatePrepareSigningValues", () => {
           },
         ],
       },
+    });
+  });
+});
+
+describe("selectTaxIdentificationNumberErrorsBySigner", () => {
+  it("keeps only Swedish Tax identification number field errors by Signer index", () => {
+    expect(
+      selectTaxIdentificationNumberErrorsBySigner([
+        { path: "documentName", code: "invalidInput" },
+        {
+          path: "signers.0.taxIdentificationNumber",
+          code: "invalidSwedishTaxIdentificationNumber",
+        },
+        { path: "signers.0.email", code: "invalidInput" },
+        {
+          path: "signers.2.taxIdentificationNumber",
+          code: "invalidSwedishTaxIdentificationNumber",
+        },
+      ]),
+    ).toEqual({
+      0: "invalidSwedishTaxIdentificationNumber",
+      2: "invalidSwedishTaxIdentificationNumber",
     });
   });
 });

@@ -1,28 +1,76 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MAX_SIGNERS } from "./prepare-values";
+import {
+  INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER,
+  MAX_SIGNERS,
+  type TaxIdentificationNumberErrorCode,
+} from "./prepare-values";
 
 type SignerRow = {
   id: string;
+};
+
+type SignerListProps = {
+  taxIdentificationNumberErrors?: Readonly<
+    Record<number, TaxIdentificationNumberErrorCode>
+  >;
+  onTaxIdentificationNumberChange?: (signerIndex: number) => void;
+};
+
+const taxIdentificationNumberMessages: Record<
+  TaxIdentificationNumberErrorCode,
+  string
+> = {
+  [INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER]:
+    "Ange ett giltigt svenskt personnummer eller samordningsnummer.",
 };
 
 function createRow(): SignerRow {
   return { id: crypto.randomUUID() };
 }
 
-export default function SignerList() {
+export default function SignerList({
+  taxIdentificationNumberErrors = {},
+  onTaxIdentificationNumberChange,
+}: SignerListProps) {
   const listId = useId();
+  const sectionRef = useRef<HTMLElement>(null);
   const [rows, setRows] = useState<SignerRow[]>(() => [createRow()]);
+  const focusedErrorKeyRef = useRef<string | null>(null);
 
   const canAdd = rows.length < MAX_SIGNERS;
   const canRemove = rows.length > 1;
 
+  const errorFocusKey = Object.keys(taxIdentificationNumberErrors)
+    .map(Number)
+    .sort((a, b) => a - b)
+    .join(",");
+
+  useEffect(() => {
+    if (!errorFocusKey) {
+      focusedErrorKeyRef.current = null;
+      return;
+    }
+
+    if (focusedErrorKeyRef.current === errorFocusKey) {
+      return;
+    }
+
+    focusedErrorKeyRef.current = errorFocusKey;
+    const firstIndex = Number(errorFocusKey.split(",")[0]);
+    const input = sectionRef.current?.querySelector<HTMLInputElement>(
+      `input[name="signers.${firstIndex}.taxIdentificationNumber"]`,
+    );
+    input?.focus();
+  }, [errorFocusKey]);
+
   return (
     <section
+      ref={sectionRef}
       className="flex flex-col gap-4"
       aria-labelledby={`${listId}-heading`}
     >
@@ -44,8 +92,17 @@ export default function SignerList() {
           const nameId = `${listId}-${row.id}-name`;
           const taxIdentificationNumberId = `${listId}-${row.id}-taxIdentificationNumber`;
           const taxIdentificationNumberHintId = `${taxIdentificationNumberId}-hint`;
+          const taxIdentificationNumberErrorId = `${taxIdentificationNumberId}-error`;
           const emailId = `${listId}-${row.id}-email`;
           const heading = `Undertecknare ${index + 1}`;
+          const taxIdentificationNumberErrorCode =
+            taxIdentificationNumberErrors[index];
+          const taxIdentificationNumberError = taxIdentificationNumberErrorCode
+            ? taxIdentificationNumberMessages[taxIdentificationNumberErrorCode]
+            : undefined;
+          const describedBy = taxIdentificationNumberError
+            ? `${taxIdentificationNumberHintId} ${taxIdentificationNumberErrorId}`
+            : taxIdentificationNumberHintId;
 
           return (
             <li
@@ -94,8 +151,17 @@ export default function SignerList() {
                   inputMode="numeric"
                   spellCheck={false}
                   autoCorrect="off"
-                  aria-describedby={taxIdentificationNumberHintId}
+                  aria-invalid={taxIdentificationNumberError ? true : undefined}
+                  aria-describedby={describedBy}
                   placeholder="ÅÅÅÅMMDD-NNNN"
+                  className={
+                    taxIdentificationNumberError
+                      ? "border-destructive focus-visible:ring-destructive"
+                      : undefined
+                  }
+                  onChange={() => {
+                    onTaxIdentificationNumberChange?.(index);
+                  }}
                 />
                 <p
                   id={taxIdentificationNumberHintId}
@@ -103,6 +169,15 @@ export default function SignerList() {
                 >
                   Svenskt personnummer eller samordningsnummer.
                 </p>
+                {taxIdentificationNumberError ? (
+                  <p
+                    id={taxIdentificationNumberErrorId}
+                    role="alert"
+                    className="text-sm text-destructive"
+                  >
+                    {taxIdentificationNumberError}
+                  </p>
+                ) : null}
               </div>
 
               <div className="flex flex-col gap-2">

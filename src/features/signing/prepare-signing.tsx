@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import PrepareSigningContent from "./prepare-signing-content";
 import PrepareSigningHeader from "./prepare-signing-header";
 import {
   parseSignersFromFormData,
+  selectTaxIdentificationNumberErrorsBySigner,
+  type TaxIdentificationNumberErrorCode,
   validatePrepareSigningValues,
 } from "./prepare-values";
 import { useObjectUrl } from "./use-object-url";
@@ -18,6 +21,8 @@ export default function PrepareSigning({
   onCancel,
 }: PrepareSigningProps) {
   const documentUrl = useObjectUrl(document);
+  const [taxIdentificationNumberErrors, setTaxIdentificationNumberErrors] =
+    useState<Readonly<Record<number, TaxIdentificationNumberErrorCode>>>({});
 
   const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -29,6 +34,15 @@ export default function PrepareSigning({
       message: String(formData.get("message") ?? ""),
       signers: parseSignersFromFormData(formData),
     });
+
+    // UI only surfaces Personnummer for now — select that subset (or clear).
+    setTaxIdentificationNumberErrors(
+      validationResult.ok
+        ? {}
+        : selectTaxIdentificationNumberErrorsBySigner(
+            validationResult.fieldErrors,
+          ),
+    );
 
     if (!validationResult.ok) {
       return;
@@ -46,6 +60,18 @@ export default function PrepareSigning({
       <PrepareSigningContent
         documentName={document.name}
         documentUrl={documentUrl}
+        taxIdentificationNumberErrors={taxIdentificationNumberErrors}
+        onTaxIdentificationNumberChange={(signerIndex) => {
+          setTaxIdentificationNumberErrors((current) => {
+            if (!(signerIndex in current)) {
+              return current;
+            }
+
+            const next = { ...current };
+            delete next[signerIndex];
+            return next;
+          });
+        }}
       />
     </form>
   );

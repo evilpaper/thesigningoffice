@@ -36,7 +36,7 @@ export async function createSigning(
   const prepared = validatePrepareSigningValues(command.values);
 
   if (!prepared.ok) {
-    return prepared;
+    return { ok: false, reason: "invalidInput" };
   }
 
   if (command.document.bytes.length === 0) {

@@ -3,6 +3,18 @@ import { normalizeSwedishTaxIdentificationNumber } from "./swedish-tax-identific
 
 export const MAX_SIGNERS = 8;
 
+export const INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER =
+  "invalidSwedishTaxIdentificationNumber" as const;
+
+export type PrepareFieldErrorCode =
+  | typeof INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER
+  | "invalidInput";
+
+export type PrepareFieldError = {
+  path: string;
+  code: PrepareFieldErrorCode;
+};
+
 const signerEmail = z
   .string()
   .trim()
@@ -14,7 +26,10 @@ const swedishTaxIdentificationNumber = z
   .transform((value, ctx) => {
     const normalized = normalizeSwedishTaxIdentificationNumber(value);
     if (normalized == null) {
-      ctx.addIssue({ code: "custom" });
+      ctx.addIssue({
+        code: "custom",
+        message: INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER,
+      });
       return z.NEVER;
     }
     return normalized;
@@ -38,7 +53,51 @@ export type PrepareSigningValues = z.infer<typeof prepareSigningValuesSchema>;
 
 export type ValidatePrepareSigningResult =
   | { ok: true; values: PrepareSigningValues }
-  | { ok: false; reason: "invalidInput" };
+  | { ok: false; reason: "invalidInput"; fieldErrors: PrepareFieldError[] };
+
+function pathToString(path: PropertyKey[]): string {
+  return path.map(String).join(".");
+}
+
+function fieldErrorsFromIssues(
+  issues: readonly { path: PropertyKey[]; message?: string }[],
+): PrepareFieldError[] {
+  return issues.map((issue) => ({
+    path: pathToString(issue.path),
+    code:
+      issue.message === INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER
+        ? INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER
+        : "invalidInput",
+  }));
+}
+
+export type TaxIdentificationNumberErrorCode =
+  typeof INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER;
+
+/**
+ * Selects Tax identification number failures from prepare field errors,
+ * keyed by Signer index. Other field errors are ignored.
+ */
+export function selectTaxIdentificationNumberErrorsBySigner(
+  fieldErrors: readonly PrepareFieldError[],
+): Readonly<Record<number, TaxIdentificationNumberErrorCode>> {
+  const result: Record<number, TaxIdentificationNumberErrorCode> = {};
+
+  for (const error of fieldErrors) {
+    if (error.code !== INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER) {
+      continue;
+    }
+
+    const match = /^signers\.(\d+)\.taxIdentificationNumber$/.exec(error.path);
+    if (!match) {
+      continue;
+    }
+
+    result[Number(match[1])] = INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER;
+  }
+
+  return result;
+}
 
 export function validatePrepareSigningValues(
   input: PrepareSigningValues,
@@ -46,7 +105,11 @@ export function validatePrepareSigningValues(
   const result = prepareSigningValuesSchema.safeParse(input);
 
   if (!result.success) {
-    return { ok: false, reason: "invalidInput" };
+    return {
+      ok: false,
+      reason: "invalidInput",
+      fieldErrors: fieldErrorsFromIssues(result.error.issues),
+    };
   }
 
   return { ok: true, values: result.data };

@@ -6,7 +6,11 @@
 
 const DIGITS_ONLY = /^\d+$/;
 
-function isValidCalendarDate(year: number, month: number, day: number): boolean {
+function isValidCalendarDate(
+  year: number,
+  month: number,
+  day: number,
+): boolean {
   if (month < 1 || month > 12 || day < 1 || day > 31) {
     return false;
   }
