@@ -10,11 +10,11 @@ const PdfViewer = dynamic(
   () => import("@/components/pdf-viewer").then((mod) => mod.PdfViewer),
   {
     ssr: false,
-    loading: () => <PreviewSkeleton />,
+    loading: () => <DocumentViewerSkeleton />,
   },
 );
 
-function PreviewSkeleton() {
+function DocumentViewerSkeleton() {
   return (
     <output
       aria-busy="true"
@@ -25,10 +25,10 @@ function PreviewSkeleton() {
   );
 }
 
-export default function DocumentPreview({ url }: { url: string | null }) {
+export default function DocumentViewer({ url }: { url: string | null }) {
   return (
     <div className="flex flex-1 min-h-0 justify-center overflow-auto bg-muted p-6 md:p-10">
-      {url ? <PdfViewer file={url} /> : <PreviewSkeleton />}
+      {url ? <PdfViewer file={url} /> : <DocumentViewerSkeleton />}
     </div>
   );
 }
