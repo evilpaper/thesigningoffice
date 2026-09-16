@@ -20,7 +20,6 @@ export default function PrepareSigningHeader({
         <ArrowLeft aria-hidden className="size-4" strokeWidth={1.75} />
         Avbryt
       </Button>
-      <output className="text-sm text-foreground">Inga fält än</output>
       <Button type="submit">Nästa</Button>
     </header>
   );

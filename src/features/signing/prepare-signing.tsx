@@ -47,6 +47,8 @@ export default function PrepareSigning({
     if (!validationResult.ok) {
       return;
     }
+
+    console.log("Yay, we're good to go!");
   };
 
   if (!documentUrl) {

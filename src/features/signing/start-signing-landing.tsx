@@ -6,7 +6,7 @@ export default function StartSigningLanding({
   onPick: (file: File) => void;
 }) {
   return (
-    <div className="flex w-full flex-col gap-12 lg:grid lg:grid-cols-[3fr_2fr] lg:items-center lg:gap-16">
+    <div className="flex w-full flex-col gap-12 lg:grid lg:grid-cols-[2fr_2fr] lg:items-center lg:gap-16">
       <article className="flex flex-col gap-4">
         <h1 className="leading-[0.9] font-semibold text-[clamp(3rem,7vw,6rem)]">
           Signera dokument
