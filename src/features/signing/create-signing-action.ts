@@ -6,18 +6,9 @@
 
 import { randomUUID } from "node:crypto";
 import { documentStore } from "@/infrastructure/document";
+import { signingRepository } from "@/infrastructure/signing-repository";
 import { createSigning } from "./create-signing";
-import type { SigningRepository } from "./ports";
 import { parseSignersFromFormData } from "./prepare-values";
-
-/**
- * createSigning always needs both ports.
- * You don’t have a real DB yet, so the stub says “pretend the DB write succeeded.”
- * That lets you finish the PDF path without blocking on Postgres.
- */
-const stubSigningRepository: SigningRepository = {
-  async create() {},
-};
 
 /**
  *
@@ -75,7 +66,7 @@ export async function createSigningAction(formData: FormData) {
     },
     {
       documentStore,
-      signingRepository: stubSigningRepository,
+      signingRepository,
     },
   );
 
