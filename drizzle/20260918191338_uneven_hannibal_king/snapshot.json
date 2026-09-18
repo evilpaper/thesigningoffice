@@ -2,14 +2,10 @@
   "version": "8",
   "dialect": "postgres",
   "id": "337c948c-af00-435c-a9c4-64c3661458b6",
-  "prevIds": [
-    "00000000-0000-0000-0000-000000000000"
-  ],
+  "prevIds": ["00000000-0000-0000-0000-000000000000"],
   "ddl": [
     {
-      "values": [
-        "draft"
-      ],
+      "values": ["draft"],
       "name": "signing_status",
       "entityType": "enums",
       "schema": "public"
@@ -180,14 +176,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "signing_id"
-      ],
+      "columns": ["signing_id"],
       "schemaTo": "public",
       "tableTo": "signings",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "name": "signers_signing_id_signings_id_fkey",
@@ -196,9 +188,7 @@
       "table": "signers"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "signers_pkey",
       "schema": "public",
@@ -206,9 +196,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "signings_pkey",
       "schema": "public",
