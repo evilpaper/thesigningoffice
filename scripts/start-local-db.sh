@@ -10,28 +10,33 @@ echo "Starting database container '$DB_CONTAINER_NAME'..."
 
 if ! [ -x "$(command -v docker)" ]; then
   echo "Docker is not installed. Install Docker Desktop and try again."
+  echo " "
   exit 1
 fi
 
 if ! docker info > /dev/null 2>&1; then
-  echo "Docker daemon is not running. Start Docker Desktop and try again."
+  echo "Bollocks! Docker daemon is not running. Start Docker Desktop and try again."
+  echo " "
   exit 1
 fi
 
 if [ "$(docker ps -q -f name=^/${DB_CONTAINER_NAME}$)" ]; then
   echo "Database container '$DB_CONTAINER_NAME' already running"
+  echo " "
   exit 0
 fi
 
 if [ "$(docker ps -q -a -f name=^/${DB_CONTAINER_NAME}$)" ]; then
   docker start "$DB_CONTAINER_NAME"
   echo "Existing database container '$DB_CONTAINER_NAME' started"
+  echo " "
   exit 0
 fi
 
 if [ ! -f "$ENV_FILE" ]; then
   echo "Missing $ENV_FILE. Run the following command to create it:"
   echo "  cp .env.example $ENV_FILE"
+  echo " "
   exit 1
 fi
 
