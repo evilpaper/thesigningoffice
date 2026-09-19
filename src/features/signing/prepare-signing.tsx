@@ -15,11 +15,13 @@ import { useObjectUrl } from "./use-object-url";
 type PrepareSigningProps = {
   document: File;
   onCancel: () => void;
+  onSuccess: () => void;
 };
 
 export default function PrepareSigning({
   document,
   onCancel,
+  onSuccess,
 }: PrepareSigningProps) {
   const documentUrl = useObjectUrl(document);
   const [taxIdentificationNumberErrors, setTaxIdentificationNumberErrors] =
@@ -54,6 +56,11 @@ export default function PrepareSigning({
      */
     formData.set("document", document);
     const result = await createSigningAction(formData);
+
+    if (result.ok) {
+      onSuccess();
+      return;
+    }
 
     console.log("createSigningAction result:", result);
   };
