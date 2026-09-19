@@ -31,3 +31,40 @@ body {
     var(--font-geist-sans), var(--font-geist-mono), ui-sans-serif, system-ui,
     sans-serif;
 }
+
+@keyframes success-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes success-draw {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+.success-rise {
+  animation: success-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.success-draw {
+  animation: success-draw 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .success-rise,
+  .success-draw {
+    animation: none;
+  }
+}

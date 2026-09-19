@@ -1,6 +1,6 @@
 import DocumentPicker from "./document-picker";
 
-export default function StartSigningLanding({
+export default function ChooseDocument({
   onPick,
 }: {
   onPick: (file: File) => void;
