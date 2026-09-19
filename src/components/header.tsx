@@ -4,14 +4,14 @@ import Logo from "./logo";
 export default function Header() {
   return (
     <header className="w-full flex flex-col sm:flex-row justify-between items-center p-8 gap-8">
-      <Link
+      <a
         href="/"
         className="flex items-center gap-1 w-fit"
-        aria-label="Express Signering - Home"
+        aria-label="The Signing Office - Home"
       >
         <Logo />
         <h1>The Signing Office</h1>
-      </Link>
+      </a>
       <Link href="/system-admin">
         <button type="button">System Admin</button>
       </Link>
