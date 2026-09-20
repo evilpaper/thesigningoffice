@@ -7,14 +7,16 @@
 import { randomUUID } from "node:crypto";
 import { documentStore } from "@/infrastructure/document";
 import { signingRepository } from "@/infrastructure/signing-repository";
-import { createSigning } from "./create-signing";
+import { type CreateSigningResult, createSigning } from "./create-signing";
 import { parseSignersFromFormData } from "./prepare-values";
 
 /**
  *
  * @param formData That’s what the browser sends on submit: named fields (documentName, message, signers…) plus the PDF file once you append it. The action’s job is to unpack that bag.
  */
-export async function createSigningAction(formData: FormData) {
+export async function createSigningAction(
+  formData: FormData,
+): Promise<CreateSigningResult> {
   /**
    * Check document is a non-empty File
    * Without bytes there’s nothing to store. Fail early with a clear reason instead of calling createSigning with garbage.
