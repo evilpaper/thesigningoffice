@@ -11,7 +11,7 @@ type State =
   | { status: "preparing"; document: File }
   | { status: "sent" };
 
-export default function StartSigningFlow() {
+export default function InitiateSigning() {
   const [state, setState] = useState<State>({ status: "choosing" });
 
   if (state.status === "choosing") {
