@@ -5,6 +5,7 @@ import { createSigningAction } from "./create-signing-action";
 import CreateSigningError, {
   type CreateSigningErrorReason,
 } from "./create-signing-error";
+import type { CreatedSigning } from "./ports";
 import PrepareSigningContent from "./prepare-signing-content";
 import PrepareSigningHeader from "./prepare-signing-header";
 import {
@@ -18,7 +19,7 @@ import { useObjectUrl } from "./use-object-url";
 type PrepareSigningProps = {
   document: File;
   onCancel: () => void;
-  onSuccess: () => void;
+  onSuccess: (signing: CreatedSigning) => void;
 };
 
 export default function PrepareSigning({
@@ -66,7 +67,7 @@ export default function PrepareSigning({
       const result = await createSigningAction(formData);
 
       if (result.ok) {
-        onSuccess();
+        onSuccess(result.signing);
         return;
       }
 

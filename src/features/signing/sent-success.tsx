@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { CreatedSigning } from "./ports";
 
-export default function SentSuccess({ onAgain }: { onAgain: () => void }) {
+type SentSuccessProps = {
+  signing: CreatedSigning;
+  onAgain: () => void;
+};
+
+export default function SentSuccess({ signing, onAgain }: SentSuccessProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -11,13 +17,13 @@ export default function SentSuccess({ onAgain }: { onAgain: () => void }) {
 
   return (
     <div className="flex w-full max-w-2xl flex-col gap-10">
-      <output className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6">
         <h1
           ref={headingRef}
           tabIndex={-1}
-          className="success-rise outline-none leading-[0.85] font-semibold text-[clamp(3.5rem,9vw,7.5rem)] tracking-[-0.04em]"
+          className="success-rise outline-none leading-[0.95] font-semibold text-[clamp(3rem,8vw,6rem)] tracking-[-0.04em]"
         >
-          Skickat
+          Dokumentet skickat
           <span className="italic font-normal text-primary">!</span>
         </h1>
 
@@ -27,19 +33,29 @@ export default function SentSuccess({ onAgain }: { onAgain: () => void }) {
           aria-hidden
         />
 
-        <div
-          className="success-rise flex max-w-md flex-col gap-3"
+        <dl
+          className="success-rise flex max-w-md flex-col gap-6"
           style={{ animationDelay: "220ms" }}
         >
-          <p className="text-lg leading-relaxed text-muted-foreground">
-            Dokumentet har skickats för signering.
-          </p>
-          <p className="text-lg leading-relaxed text-muted-foreground">
-            Tack för att du använder{" "}
-            <span className="text-foreground">The Signing Office</span>.
-          </p>
-        </div>
-      </output>
+          <div className="flex flex-col gap-1">
+            <dt className="text-sm font-medium text-muted-foreground">
+              Dokument
+            </dt>
+            <dd className="text-lg text-foreground">{signing.documentName}</dd>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <dt className="text-sm font-medium text-muted-foreground">Till</dt>
+            <dd>
+              <ul className="flex flex-col gap-1 text-lg text-foreground">
+                {signing.signerEmails.map((email, index) => (
+                  <li key={`${index}-${email}`}>{email}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        </dl>
+      </div>
 
       <button
         type="button"

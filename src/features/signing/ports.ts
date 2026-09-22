@@ -5,6 +5,12 @@ export type DocumentStore = {
   delete(key: string): Promise<void>;
 };
 
+export type CreatedSigning = {
+  id: string;
+  documentName: string;
+  signerEmails: string[];
+};
+
 export type SigningRepository = {
   create(input: {
     signingId: string;
@@ -12,5 +18,5 @@ export type SigningRepository = {
     message: string;
     signers: Signer[];
     documentKey: string;
-  }): Promise<void>;
+  }): Promise<CreatedSigning>;
 };

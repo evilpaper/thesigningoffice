@@ -1,5 +1,5 @@
 import { createDocumentKey } from "@/infrastructure/document";
-import type { DocumentStore, SigningRepository } from "./ports";
+import type { CreatedSigning, DocumentStore, SigningRepository } from "./ports";
 import type { PrepareSigningValues } from "./prepare-values";
 import { validatePrepareSigningValues } from "./prepare-values";
 
@@ -18,7 +18,7 @@ export type CreateSigningPorts = {
 };
 
 export type CreateSigningResult =
-  | { ok: true; signingId: string }
+  | { ok: true; signing: CreatedSigning }
   | {
       ok: false;
       reason: "invalidDocument" | "invalidInput" | "storageFailed";
@@ -57,8 +57,10 @@ export async function createSigning(
     return { ok: false, reason: "storageFailed" };
   }
 
+  let signing: CreatedSigning;
+
   try {
-    await ports.signingRepository.create({
+    signing = await ports.signingRepository.create({
       signingId: command.signingId,
       documentName: prepared.values.documentName,
       message: prepared.values.message,
@@ -83,5 +85,5 @@ export async function createSigning(
     };
   }
 
-  return { ok: true, signingId: command.signingId };
+  return { ok: true, signing };
 }

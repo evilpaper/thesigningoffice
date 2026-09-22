@@ -22,6 +22,11 @@ const signers: Signer[] = [
     email: "ada@example.com",
   },
 ];
+const createdSigning = {
+  id: signingId,
+  documentName: "Employment contract",
+  signerEmails: ["ada@example.com"],
+};
 
 type FakePorts = CreateSigningPorts & {
   documentStore: {
@@ -55,7 +60,7 @@ function fakePorts(overrides?: {
             message: string;
             signers: Signer[];
             documentKey: string;
-          }) => {},
+          }) => createdSigning,
         ),
     },
   } as FakePorts;
@@ -106,7 +111,7 @@ describe("createSigning", () => {
       ports.signingRepository.create.mock.invocationCallOrder[0],
     );
 
-    expect(result).toEqual({ ok: true, signingId });
+    expect(result).toEqual({ ok: true, signing: createdSigning });
   });
 
   it("returns invalidInput with zero I/O when prepare values fail validation", async () => {
