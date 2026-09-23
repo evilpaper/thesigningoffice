@@ -13,7 +13,7 @@ import type { Signer } from "./prepare-values";
  */
 
 const signingId = "550e8400-e29b-41d4-a716-446655440000";
-const documentKey = "documents/550e8400-e29b-41d4-a716-446655440000.pdf";
+const storedKey = "stored-document-key";
 const bytes = new Uint8Array([1, 2, 3]);
 const signers: Signer[] = [
   {
@@ -45,9 +45,7 @@ function fakePorts(overrides?: {
 }): FakePorts {
   return {
     documentStore: {
-      store:
-        overrides?.store ??
-        vi.fn(async (_input: { bytes: Uint8Array; key: string }) => {}),
+      store: overrides?.store ?? vi.fn(async () => storedKey),
       delete: overrides?.delete ?? vi.fn(async (_key: string) => {}),
     },
     signingRepository: {
@@ -89,14 +87,15 @@ function validCommand(
 }
 
 describe("createSigning", () => {
-  it("stores Document bytes then creates Signing metadata with documentKey", async () => {
+  it("stores Document bytes then creates Signing metadata with the key from DocumentStore", async () => {
     const ports = fakePorts();
 
     const result = await createSigning(validCommand(), ports);
 
     expect(ports.documentStore.store).toHaveBeenCalledWith({
       bytes,
-      key: documentKey,
+      signingId,
+      fileName: "contract.pdf",
     });
 
     expect(ports.signingRepository.create).toHaveBeenCalledWith({
@@ -104,7 +103,7 @@ describe("createSigning", () => {
       documentName: "Employment contract",
       message: "Please sign",
       signers,
-      documentKey,
+      documentKey: storedKey,
     });
 
     expect(ports.documentStore.store.mock.invocationCallOrder[0]).toBeLessThan(
@@ -161,7 +160,7 @@ describe("createSigning", () => {
 
     const result = await createSigning(validCommand(), ports);
 
-    expect(ports.documentStore.delete).toHaveBeenCalledWith(documentKey);
+    expect(ports.documentStore.delete).toHaveBeenCalledWith(storedKey);
     expect(result).toEqual({
       ok: false,
       reason: "databaseUnavailable",
@@ -177,7 +176,7 @@ describe("createSigning", () => {
 
     const result = await createSigning(validCommand(), ports);
 
-    expect(ports.documentStore.delete).toHaveBeenCalledWith(documentKey);
+    expect(ports.documentStore.delete).toHaveBeenCalledWith(storedKey);
     expect(result).toEqual({
       ok: false,
       reason: "databaseUnavailable",

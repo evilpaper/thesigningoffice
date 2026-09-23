@@ -1,7 +1,11 @@
 import type { Signer } from "./prepare-values";
 
 export type DocumentStore = {
-  store(input: { bytes: Uint8Array; key: string }): Promise<void>;
+  store(input: {
+    bytes: Uint8Array;
+    signingId: string;
+    fileName: string;
+  }): Promise<string>;
   delete(key: string): Promise<void>;
 };
 

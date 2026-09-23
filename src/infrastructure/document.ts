@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import type { DocumentStore } from "@/features/signing/ports";
 
 type DocumentStorageKind = "local" | "bucket";
 
@@ -20,7 +21,7 @@ function getDocumentStorageKind(): DocumentStorageKind {
   );
 }
 
-export function createDocumentKey(signingId: string, fileName: string): string {
+function createDocumentKey(signingId: string, fileName: string): string {
   const baseName = path.basename(fileName);
   const extension = path.extname(baseName);
   return `documents/${signingId}${extension}`;
@@ -43,12 +44,15 @@ async function deleteDocumentLocally(key: string): Promise<void> {
 
 export async function storeDocument(input: {
   bytes: Uint8Array;
-  key: string;
-}): Promise<void> {
+  signingId: string;
+  fileName: string;
+}): Promise<string> {
+  const key = createDocumentKey(input.signingId, input.fileName);
+
   switch (getDocumentStorageKind()) {
     case "local":
-      await storeDocumentLocally(input.bytes, input.key);
-      return;
+      await storeDocumentLocally(input.bytes, key);
+      return key;
     case "bucket":
       throw new Error("Document bucket storage is not configured yet.");
   }
@@ -64,7 +68,7 @@ export async function deleteDocument(key: string): Promise<void> {
   }
 }
 
-export const documentStore = {
+export const documentStore: DocumentStore = {
   store: storeDocument,
   delete: deleteDocument,
 };

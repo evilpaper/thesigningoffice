@@ -1,4 +1,3 @@
-import { createDocumentKey } from "@/infrastructure/document";
 import type { CreatedSigning, DocumentStore, SigningRepository } from "./ports";
 import type { PrepareSigningValues } from "./prepare-values";
 import { validatePrepareSigningValues } from "./prepare-values";
@@ -43,15 +42,13 @@ export async function createSigning(
     return { ok: false, reason: "invalidDocument" };
   }
 
-  const documentKey = createDocumentKey(
-    command.signingId,
-    command.document.fileName,
-  );
+  let documentKey: string;
 
   try {
-    await ports.documentStore.store({
+    documentKey = await ports.documentStore.store({
       bytes: command.document.bytes,
-      key: documentKey,
+      signingId: command.signingId,
+      fileName: command.document.fileName,
     });
   } catch {
     return { ok: false, reason: "storageFailed" };
