@@ -1,76 +1,68 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER,
-  MAX_SIGNERS,
-  type TaxIdentificationNumberErrorCode,
-} from "./prepare-values";
+import { MAX_SIGNERS, type PrepareFieldError } from "./prepare-values";
 
 type SignerRow = {
   id: string;
 };
 
 type SignerListProps = {
-  taxIdentificationNumberErrors?: Readonly<
-    Record<number, TaxIdentificationNumberErrorCode>
-  >;
-  onTaxIdentificationNumberChange?: (signerIndex: number) => void;
+  fieldErrors?: readonly PrepareFieldError[];
+  onDismissFieldError?: (path: string) => void;
 };
 
-const taxIdentificationNumberMessages: Record<
-  TaxIdentificationNumberErrorCode,
-  string
-> = {
-  [INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER]:
+type SignerField = "name" | "taxIdentificationNumber" | "email";
+
+const SIGNER_FIELD_MESSAGES: Record<SignerField, string> = {
+  name: "Ange ett namn.",
+  taxIdentificationNumber:
     "Ange ett giltigt svenskt personnummer eller samordningsnummer.",
+  email: "Ange en giltig e-postadress.",
 };
+
+const invalidFieldClassName =
+  "border-destructive focus-visible:ring-destructive";
 
 function createRow(): SignerRow {
   return { id: crypto.randomUUID() };
 }
 
+function signerFieldMessage(
+  fieldErrors: readonly PrepareFieldError[],
+  index: number,
+  field: SignerField,
+): string | undefined {
+  const path = `signers.${index}.${field}`;
+  return fieldErrors.some((error) => error.path === path)
+    ? SIGNER_FIELD_MESSAGES[field]
+    : undefined;
+}
+
 export default function SignerList({
-  taxIdentificationNumberErrors = {},
-  onTaxIdentificationNumberChange,
+  fieldErrors = [],
+  onDismissFieldError,
 }: SignerListProps) {
   const listId = useId();
-  const sectionRef = useRef<HTMLElement>(null);
   const [rows, setRows] = useState<SignerRow[]>(() => [createRow()]);
-  const focusedErrorKeyRef = useRef<string | null>(null);
 
   const canAdd = rows.length < MAX_SIGNERS;
   const canRemove = rows.length > 1;
+  const signersError = fieldErrors.some((error) => error.path === "signers")
+    ? `Ange mellan 1 och ${MAX_SIGNERS} undertecknare.`
+    : undefined;
+  const signersErrorId = `${listId}-signers-error`;
 
-  const errorFocusKey = Object.keys(taxIdentificationNumberErrors)
-    .map(Number)
-    .sort((a, b) => a - b)
-    .join(",");
-
-  useEffect(() => {
-    if (!errorFocusKey) {
-      focusedErrorKeyRef.current = null;
-      return;
-    }
-
-    if (focusedErrorKeyRef.current === errorFocusKey) {
-      return;
-    }
-
-    focusedErrorKeyRef.current = errorFocusKey;
-    const firstIndex = Number(errorFocusKey.split(",")[0]);
-    const input = sectionRef.current?.querySelector<HTMLInputElement>(
-      `input[name="signers.${firstIndex}.taxIdentificationNumber"]`,
-    );
-    input?.focus();
-  }, [errorFocusKey]);
+  const changeRows = (next: SignerRow[]) => {
+    setRows(next);
+    onDismissFieldError?.("signers");
+  };
 
   return (
     <section
-      ref={sectionRef}
       className="flex flex-col gap-4"
       aria-labelledby={`${listId}-heading`}
     >
@@ -85,24 +77,40 @@ export default function SignerList({
           Lägg till dig själv om du också ska signera. Högst {MAX_SIGNERS}{" "}
           undertecknare.
         </p>
+        {signersError ? (
+          <p
+            id={signersErrorId}
+            data-prepare-field="signers"
+            tabIndex={-1}
+            role="alert"
+            className="text-sm text-destructive"
+          >
+            {signersError}
+          </p>
+        ) : null}
       </div>
 
       <ul className="flex flex-col gap-4">
         {rows.map((row, index) => {
           const nameId = `${listId}-${row.id}-name`;
+          const nameErrorId = `${nameId}-error`;
           const taxIdentificationNumberId = `${listId}-${row.id}-taxIdentificationNumber`;
           const taxIdentificationNumberHintId = `${taxIdentificationNumberId}-hint`;
           const taxIdentificationNumberErrorId = `${taxIdentificationNumberId}-error`;
           const emailId = `${listId}-${row.id}-email`;
+          const emailErrorId = `${emailId}-error`;
           const heading = `Undertecknare ${index + 1}`;
-          const taxIdentificationNumberErrorCode =
-            taxIdentificationNumberErrors[index];
-          const taxIdentificationNumberError = taxIdentificationNumberErrorCode
-            ? taxIdentificationNumberMessages[taxIdentificationNumberErrorCode]
-            : undefined;
-          const describedBy = taxIdentificationNumberError
-            ? `${taxIdentificationNumberHintId} ${taxIdentificationNumberErrorId}`
-            : taxIdentificationNumberHintId;
+          const nameError = signerFieldMessage(fieldErrors, index, "name");
+          const taxIdentificationNumberError = signerFieldMessage(
+            fieldErrors,
+            index,
+            "taxIdentificationNumber",
+          );
+          const emailError = signerFieldMessage(fieldErrors, index, "email");
+          const taxIdentificationNumberDescribedBy =
+            taxIdentificationNumberError
+              ? `${taxIdentificationNumberHintId} ${taxIdentificationNumberErrorId}`
+              : taxIdentificationNumberHintId;
 
           return (
             <li
@@ -120,10 +128,10 @@ export default function SignerList({
                   disabled={!canRemove}
                   aria-label={`Ta bort ${heading}`}
                   onClick={() => {
-                    setRows((current) =>
-                      current.length <= 1
-                        ? current
-                        : current.filter((item) => item.id !== row.id),
+                    changeRows(
+                      rows.length <= 1
+                        ? rows
+                        : rows.filter((item) => item.id !== row.id),
                     );
                   }}
                 >
@@ -138,7 +146,24 @@ export default function SignerList({
                   name={`signers.${index}.name`}
                   required
                   autoComplete="name"
+                  aria-invalid={nameError ? true : undefined}
+                  aria-describedby={nameError ? nameErrorId : undefined}
+                  className={nameError ? invalidFieldClassName : undefined}
+                  onChange={
+                    nameError
+                      ? () => onDismissFieldError?.(`signers.${index}.name`)
+                      : undefined
+                  }
                 />
+                {nameError ? (
+                  <p
+                    id={nameErrorId}
+                    role="alert"
+                    className="text-sm text-destructive"
+                  >
+                    {nameError}
+                  </p>
+                ) : null}
               </div>
 
               <div className="flex flex-col gap-2">
@@ -152,16 +177,21 @@ export default function SignerList({
                   spellCheck={false}
                   autoCorrect="off"
                   aria-invalid={taxIdentificationNumberError ? true : undefined}
-                  aria-describedby={describedBy}
+                  aria-describedby={taxIdentificationNumberDescribedBy}
                   placeholder="ÅÅÅÅMMDD-NNNN"
                   className={
                     taxIdentificationNumberError
-                      ? "border-destructive focus-visible:ring-destructive"
+                      ? invalidFieldClassName
                       : undefined
                   }
-                  onChange={() => {
-                    onTaxIdentificationNumberChange?.(index);
-                  }}
+                  onChange={
+                    taxIdentificationNumberError
+                      ? () =>
+                          onDismissFieldError?.(
+                            `signers.${index}.taxIdentificationNumber`,
+                          )
+                      : undefined
+                  }
                 />
                 <p
                   id={taxIdentificationNumberHintId}
@@ -188,7 +218,24 @@ export default function SignerList({
                   type="email"
                   required
                   autoComplete="email"
+                  aria-invalid={emailError ? true : undefined}
+                  aria-describedby={emailError ? emailErrorId : undefined}
+                  className={emailError ? invalidFieldClassName : undefined}
+                  onChange={
+                    emailError
+                      ? () => onDismissFieldError?.(`signers.${index}.email`)
+                      : undefined
+                  }
                 />
+                {emailError ? (
+                  <p
+                    id={emailErrorId}
+                    role="alert"
+                    className="text-sm text-destructive"
+                  >
+                    {emailError}
+                  </p>
+                ) : null}
               </div>
             </li>
           );
@@ -201,8 +248,8 @@ export default function SignerList({
         size="sm"
         disabled={!canAdd}
         onClick={() => {
-          setRows((current) =>
-            current.length >= MAX_SIGNERS ? current : [...current, createRow()],
+          changeRows(
+            rows.length >= MAX_SIGNERS ? rows : [...rows, createRow()],
           );
         }}
       >

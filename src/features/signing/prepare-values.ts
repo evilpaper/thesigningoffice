@@ -71,34 +71,6 @@ function fieldErrorsFromIssues(
   }));
 }
 
-export type TaxIdentificationNumberErrorCode =
-  typeof INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER;
-
-/**
- * Selects Tax identification number failures from prepare field errors,
- * keyed by Signer index. Other field errors are ignored.
- */
-export function selectTaxIdentificationNumberErrorsBySigner(
-  fieldErrors: readonly PrepareFieldError[],
-): Readonly<Record<number, TaxIdentificationNumberErrorCode>> {
-  const result: Record<number, TaxIdentificationNumberErrorCode> = {};
-
-  for (const error of fieldErrors) {
-    if (error.code !== INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER) {
-      continue;
-    }
-
-    const match = /^signers\.(\d+)\.taxIdentificationNumber$/.exec(error.path);
-    if (!match) {
-      continue;
-    }
-
-    result[Number(match[1])] = INVALID_SWEDISH_TAX_IDENTIFICATION_NUMBER;
-  }
-
-  return result;
-}
-
 export function validatePrepareSigningValues(
   input: PrepareSigningValues,
 ): ValidatePrepareSigningResult {

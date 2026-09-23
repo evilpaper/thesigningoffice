@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   type PrepareSigningValues,
-  selectTaxIdentificationNumberErrorsBySigner,
   validatePrepareSigningValues,
 } from "./prepare-values";
 
@@ -248,28 +247,6 @@ describe("validatePrepareSigningValues", () => {
           },
         ],
       },
-    });
-  });
-});
-
-describe("selectTaxIdentificationNumberErrorsBySigner", () => {
-  it("keeps only Swedish Tax identification number field errors by Signer index", () => {
-    expect(
-      selectTaxIdentificationNumberErrorsBySigner([
-        { path: "documentName", code: "invalidInput" },
-        {
-          path: "signers.0.taxIdentificationNumber",
-          code: "invalidSwedishTaxIdentificationNumber",
-        },
-        { path: "signers.0.email", code: "invalidInput" },
-        {
-          path: "signers.2.taxIdentificationNumber",
-          code: "invalidSwedishTaxIdentificationNumber",
-        },
-      ]),
-    ).toEqual({
-      0: "invalidSwedishTaxIdentificationNumber",
-      2: "invalidSwedishTaxIdentificationNumber",
     });
   });
 });
