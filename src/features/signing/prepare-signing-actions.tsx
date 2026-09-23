@@ -1,13 +1,13 @@
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type PrepareSigningHeaderProps = {
+type PrepareSigningActionsProps = {
   onCancel: () => void;
 };
 
-export default function PrepareSigningHeader({
+export default function PrepareSigningActions({
   onCancel,
-}: PrepareSigningHeaderProps) {
+}: PrepareSigningActionsProps) {
   return (
     <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4 py-3 sm:px-6">
       <Button

@@ -5,14 +5,16 @@ import { createSigningAction } from "./create-signing-action";
 import CreateSigningError, {
   type CreateSigningErrorReason,
 } from "./create-signing-error";
+import DocumentPreview from "./document-preview";
 import type { CreatedSigning } from "./ports";
-import PrepareSigningContent from "./prepare-signing-content";
-import PrepareSigningHeader from "./prepare-signing-header";
+import PrepareSigningActions from "./prepare-signing-actions";
 import {
   type PrepareFieldError,
   parseSignersFromFormData,
   validatePrepareSigningValues,
 } from "./prepare-values";
+import SignerList from "./signer-list";
+import SigningDetails from "./signing-details";
 import { useObjectUrl } from "./use-object-url";
 
 type PrepareSigningProps = {
@@ -152,19 +154,30 @@ export default function PrepareSigning({
       onSubmit={handleSubmit}
     >
       <h1 className="sr-only">Förbered signering</h1>
-      <PrepareSigningHeader onCancel={onCancel} />
+      <PrepareSigningActions onCancel={onCancel} />
       {createSigningError && (
         <CreateSigningError
           reason={createSigningError}
           onDismiss={() => setCreateSigningError(null)}
         />
       )}
-      <PrepareSigningContent
-        documentName={document.name}
-        documentUrl={documentUrl}
-        fieldErrors={fieldErrors}
-        onDismissFieldError={dismissFieldError}
-      />
+      <section className="flex flex-1 min-h-0 flex-col md:flex-row">
+        <aside
+          aria-label="Förbered signering"
+          className="flex w-full shrink-0 flex-col gap-6 overflow-y-auto border-b border-border bg-background p-4 md:w-[280px] md:border-b-0 md:border-r"
+        >
+          <SignerList
+            fieldErrors={fieldErrors}
+            onDismissFieldError={dismissFieldError}
+          />
+          <SigningDetails
+            documentName={document.name}
+            fieldErrors={fieldErrors}
+            onDismissFieldError={dismissFieldError}
+          />
+        </aside>
+        <DocumentPreview url={documentUrl} />
+      </section>
     </form>
   );
 }
