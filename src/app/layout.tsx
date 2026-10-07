@@ -29,7 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script src="/theme-init.js" />
       </head>
-      <body className="min-h-full flex flex-col">
+      <body className="h-dvh flex flex-col">
         <Header />
         {children}
       </body>

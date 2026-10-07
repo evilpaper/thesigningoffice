@@ -47,9 +47,13 @@ export const prepareSigningValuesSchema = z.object({
   signers: z.array(signerSchema).min(1).max(MAX_SIGNERS),
 });
 
-export type Signer = z.infer<typeof signerSchema>;
+export type Signer = z.output<typeof signerSchema>;
 
-export type PrepareSigningValues = z.infer<typeof prepareSigningValuesSchema>;
+export type PrepareSigningValues = z.output<typeof prepareSigningValuesSchema>;
+
+export type PrepareSigningValuesInput = z.input<
+  typeof prepareSigningValuesSchema
+>;
 
 export type ValidatePrepareSigningResult =
   | { ok: true; values: PrepareSigningValues }
@@ -72,7 +76,7 @@ function fieldErrorsFromIssues(
 }
 
 export function validatePrepareSigningValues(
-  input: PrepareSigningValues,
+  input: PrepareSigningValuesInput,
 ): ValidatePrepareSigningResult {
   const result = prepareSigningValuesSchema.safeParse(input);
 
@@ -87,8 +91,10 @@ export function validatePrepareSigningValues(
   return { ok: true, values: result.data };
 }
 
-export function parseSignersFromFormData(formData: FormData): Signer[] {
-  const signers: Signer[] = [];
+export function parsePrepareSigningValuesFromFormData(
+  formData: FormData,
+): PrepareSigningValuesInput {
+  const signers: PrepareSigningValuesInput["signers"] = [];
 
   for (let index = 0; index < MAX_SIGNERS; index += 1) {
     const nameValue = formData.get(`signers.${index}.name`);
@@ -105,5 +111,9 @@ export function parseSignersFromFormData(formData: FormData): Signer[] {
     });
   }
 
-  return signers;
+  return {
+    documentName: String(formData.get("documentName") ?? ""),
+    message: String(formData.get("message") ?? ""),
+    signers,
+  };
 }

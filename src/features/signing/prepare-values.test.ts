@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   type PrepareSigningValues,
+  parsePrepareSigningValuesFromFormData,
   validatePrepareSigningValues,
 } from "./prepare-values";
 
@@ -247,6 +248,61 @@ describe("validatePrepareSigningValues", () => {
           },
         ],
       },
+    });
+  });
+});
+
+describe("parsePrepareSigningValuesFromFormData", () => {
+  it("reads Document name, Message, and Signers from the prepare field names", () => {
+    const formData = new FormData();
+    formData.set("documentName", "  Avtal  ");
+    formData.set("message", "  Hej  ");
+    formData.set("signers.0.name", "  Ada Lovelace  ");
+    formData.set("signers.0.taxIdentificationNumber", "  800101-1231  ");
+    formData.set("signers.0.email", "  ada@example.com  ");
+    formData.set("signers.1.name", "Grace Hopper");
+    formData.set("signers.1.taxIdentificationNumber", "not-a-number");
+    formData.set("signers.1.email", "grace@example.com");
+
+    expect(parsePrepareSigningValuesFromFormData(formData)).toEqual({
+      documentName: "  Avtal  ",
+      message: "  Hej  ",
+      signers: [
+        {
+          name: "Ada Lovelace",
+          taxIdentificationNumber: "800101-1231",
+          email: "ada@example.com",
+        },
+        {
+          name: "Grace Hopper",
+          taxIdentificationNumber: "not-a-number",
+          email: "grace@example.com",
+        },
+      ],
+    });
+  });
+
+  it("stops at the first missing Signer name field", () => {
+    const formData = new FormData();
+    formData.set("documentName", "Avtal");
+    formData.set("message", "");
+    formData.set("signers.0.name", "Ada Lovelace");
+    formData.set("signers.0.taxIdentificationNumber", VALID_TIN);
+    formData.set("signers.0.email", "ada@example.com");
+    formData.set("signers.2.name", "Skipped");
+    formData.set("signers.2.taxIdentificationNumber", VALID_TIN);
+    formData.set("signers.2.email", "skip@example.com");
+
+    expect(parsePrepareSigningValuesFromFormData(formData)).toEqual({
+      documentName: "Avtal",
+      message: "",
+      signers: [
+        {
+          name: "Ada Lovelace",
+          taxIdentificationNumber: VALID_TIN,
+          email: "ada@example.com",
+        },
+      ],
     });
   });
 });

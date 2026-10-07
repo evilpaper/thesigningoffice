@@ -1,5 +1,5 @@
 import type { CreatedSigning, DocumentStore, SigningRepository } from "./ports";
-import type { PrepareSigningValues } from "./prepare-values";
+import type { PrepareSigningValuesInput } from "./prepare-values";
 import { validatePrepareSigningValues } from "./prepare-values";
 
 export type CreateSigningCommand = {
@@ -8,7 +8,7 @@ export type CreateSigningCommand = {
     bytes: Uint8Array;
     fileName: string;
   };
-  values: PrepareSigningValues;
+  values: PrepareSigningValuesInput;
 };
 
 export type CreateSigningPorts = {

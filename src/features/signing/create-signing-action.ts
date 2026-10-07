@@ -8,7 +8,7 @@ import { randomUUID } from "node:crypto";
 import { documentStore } from "@/infrastructure/document";
 import { signingRepository } from "@/infrastructure/signing-repository";
 import { type CreateSigningResult, createSigning } from "./create-signing";
-import { parseSignersFromFormData } from "./prepare-values";
+import { parsePrepareSigningValuesFromFormData } from "./prepare-values";
 
 /**
  *
@@ -26,13 +26,7 @@ export async function createSigningAction(
     return { ok: false, reason: "invalidDocument" };
   }
 
-  /**
-   * Read documentName, message, signers
-   * Those are the prepare fields. The PDF alone isn’t a signing — metadata + who signs matter too. This is what makes this action different from the old pick-file path in start-signing.ts.
-   */
-  const documentName = String(formData.get("documentName") ?? "");
-  const message = String(formData.get("message") ?? "");
-  const signers = parseSignersFromFormData(formData);
+  const values = parsePrepareSigningValuesFromFormData(formData);
 
   /**
    * Create signingId
@@ -60,11 +54,7 @@ export async function createSigningAction(
         bytes: buffer,
         fileName: document.name,
       },
-      values: {
-        documentName,
-        message,
-        signers,
-      },
+      values,
     },
     {
       documentStore,

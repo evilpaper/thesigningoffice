@@ -10,7 +10,7 @@ import type { CreatedSigning } from "./ports";
 import PrepareSigningActions from "./prepare-signing-actions";
 import {
   type PrepareFieldError,
-  parseSignersFromFormData,
+  parsePrepareSigningValuesFromFormData,
   validatePrepareSigningValues,
 } from "./prepare-values";
 import SignerList from "./signer-list";
@@ -109,11 +109,9 @@ export default function PrepareSigning({
 
     const formData = new FormData(event.currentTarget);
 
-    const validationResult = validatePrepareSigningValues({
-      documentName: String(formData.get("documentName") ?? ""),
-      message: String(formData.get("message") ?? ""),
-      signers: parseSignersFromFormData(formData),
-    });
+    const validationResult = validatePrepareSigningValues(
+      parsePrepareSigningValuesFromFormData(formData),
+    );
 
     if (!validationResult.ok) {
       setFieldErrors(validationResult.fieldErrors);

@@ -14,6 +14,9 @@ importers:
       dotenv:
         specifier: ^18.0.0
         version: 18.0.0
+      drawesome:
+        specifier: ^0.1.2
+        version: 0.1.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       drizzle-orm:
         specifier: 1.0.0-rc.4
         version: 1.0.0-rc.4(@types/pg@8.23.1)(pg@8.23.0)(zod@4.6.2)
@@ -1049,6 +1052,13 @@ packages:
     resolution: {integrity: sha512-16YSUvsKtKbwrTbESvtTSZzzJUug6jdFdqiBFg9Q6Bk1JY9r0hAtrtTiWxdI9YrsgOTmkjZRdgU0n3LnwGpECw==}
     engines: {node: '>=12'}
     hasBin: true
+
+  drawesome@0.1.2:
+    resolution: {integrity: sha512-dF6ryJdpvPB7t2YUh7LZAV8eOsKKjBxq5cOpq/CSL8LgWuuYjmBC+StdeuKLIP8LqjY9sPpUI92dPPtBLTUGgQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
 
   drizzle-kit@1.0.0-rc.4:
     resolution: {integrity: sha512-KZCpjRyu+oYHLj/UJogfFlOkWhHVkaEI2EOT1U3NDVXUzLoTyPjqwFxwOrlQxsY6jzRyxcz4EacqboGfhEeYrA==}
@@ -2382,6 +2392,11 @@ snapshots:
   detect-libc@2.1.2: {}
 
   dotenv@18.0.0: {}
+
+  drawesome@0.1.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+    dependencies:
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
 
   drizzle-kit@1.0.0-rc.4:
     dependencies:
