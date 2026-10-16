@@ -2,7 +2,7 @@
 
 Core language for user-facing concepts in The Signing Office product.
 
-**Story**: A preparer chooses a Document, enters Document name, optional Message, and Signers, then submits prepare. That creates a Signing in Draft that owns the Document and those Signers.
+**Story**: A preparer chooses a Document for preview, enters Document name, optional Message, and Signers, then submits prepare. That creates a Signing that owns the Document and those Signers, and asks the Signers to sign.
 
 ## Language
 
@@ -22,20 +22,20 @@ _Avoid_: File, PDF, attachment
 The human-facing name of the Document.
 _Avoid_: Document title, filename, title
 
-**Signing**:
-A case of collecting signatures on one Document. It exists from the moment the Document is submitted — when the preparer confirms the Document together with its Signers (prepare complete), not merely when a file is picked for preview — including before anyone has been asked to sign.
-_Avoid_: Upload, job, session, signing request
+**Preview**:
+The preparer's view of a chosen Document before prepare is submitted. No Signing exists yet.
+_Avoid_: Draft, unsaved Signing
 
-**Draft**:
-The status of a Signing that exists but has not yet been sent to anyone to sign.
-_Avoid_: Draft Signing, pending, unpublished
+**Signing**:
+A case of collecting signatures on one Document. It exists from the moment prepare is submitted — when the preparer confirms the Document together with its Signers — and that same moment asks those Signers to sign. Picking a file for Preview alone does not create a Signing.
+_Avoid_: Upload, job, session, signing request, Draft
 
 **Field**:
 A place on the Document where someone is asked to sign or enter information.
 _Avoid_: Annotation, widget, form control
 
 **Message**:
-Optional text included when the Signing is sent to the Signers.
+Optional text included when the Signers are asked to sign.
 _Avoid_: Note, comment, email body
 
 **Signer**:

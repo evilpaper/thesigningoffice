@@ -8,7 +8,7 @@ import type { Signer } from "./prepare-values";
 
 /**
  * When prepare is submitted, createSigning stores Document bytes then persists
- * Signing metadata (Draft) via SigningRepository — never bytes in Postgres.
+ * Signing metadata via SigningRepository — never bytes in Postgres.
  * Failures return a closed union; compensating delete on repository failure.
  */
 

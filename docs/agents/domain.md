@@ -4,7 +4,7 @@ How the engineering skills should consume this repo's domain documentation when 
 
 ## System story
 
-The preparer fills prepare in the UI; submit sends the values to the server; `createSigning` stores Document bytes in object storage and Signing metadata (including Signers) in Postgres as a Draft. Everything else (slices, ports, Vitest fakes, compensating file delete) exists to keep that path clear and testable.
+The preparer fills prepare in the UI; submit sends the values to the server; `createSigning` stores Document bytes in object storage and Signing metadata (including Signers) in Postgres. That create is also when Signers are asked to sign. Everything else (slices, ports, Vitest fakes, compensating file delete) exists to keep that path clear and testable.
 
 ## Before exploring, read these
 

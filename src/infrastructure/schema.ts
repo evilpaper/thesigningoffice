@@ -1,20 +1,16 @@
 import {
   integer,
-  pgEnum,
   pgTable,
   text,
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
 
-export const signingStatusEnum = pgEnum("signing_status", ["draft"]);
-
 export const signings = pgTable("signings", {
   id: uuid("id").primaryKey(),
   documentName: text("document_name").notNull(),
   message: text("message").notNull().default(""),
   documentKey: text("document_key").notNull(),
-  status: signingStatusEnum("status").notNull().default("draft"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

@@ -12,7 +12,6 @@ export const signingRepository: SigningRepository = {
           documentName: input.documentName,
           message: input.message,
           documentKey: input.documentKey,
-          // status defaults to "draft" in schema
         })
         .returning({
           id: signings.id,
