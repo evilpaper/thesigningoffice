@@ -6,6 +6,7 @@
 
 import { randomUUID } from "node:crypto";
 import { documentStore } from "@/infrastructure/document";
+import { mailer } from "@/infrastructure/mailer";
 import { signingRepository } from "@/infrastructure/signing-repository";
 import { type CreateSigningResult, createSigning } from "./create-signing";
 import { parsePrepareSigningValuesFromFormData } from "./prepare-values";
@@ -59,6 +60,7 @@ export async function createSigningAction(
     {
       documentStore,
       signingRepository,
+      mailer,
     },
   );
 

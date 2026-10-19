@@ -8,8 +8,9 @@ import type { Signer } from "./prepare-values";
 
 /**
  * When prepare is submitted, createSigning stores Document bytes then persists
- * Signing metadata via SigningRepository — never bytes in Postgres.
- * Failures return a closed union; compensating delete on repository failure.
+ * Signing metadata via SigningRepository — never bytes in Postgres — then asks
+ * each Signer via Mailer. Failures return a closed union; compensating delete
+ * on repository failure.
  */
 
 const signingId = "550e8400-e29b-41d4-a716-446655440000";
@@ -36,12 +37,16 @@ type FakePorts = CreateSigningPorts & {
   signingRepository: {
     create: ReturnType<typeof vi.fn>;
   };
+  mailer: {
+    sendForSigning: ReturnType<typeof vi.fn>;
+  };
 };
 
 function fakePorts(overrides?: {
   store?: ReturnType<typeof vi.fn>;
   delete?: ReturnType<typeof vi.fn>;
   create?: ReturnType<typeof vi.fn>;
+  sendForSigning?: ReturnType<typeof vi.fn>;
 }): FakePorts {
   return {
     documentStore: {
@@ -60,6 +65,10 @@ function fakePorts(overrides?: {
             documentKey: string;
           }) => createdSigning,
         ),
+    },
+    mailer: {
+      sendForSigning:
+        overrides?.sendForSigning ?? vi.fn(async (_input: unknown) => {}),
     },
   } as FakePorts;
 }
@@ -113,6 +122,48 @@ describe("createSigning", () => {
     expect(result).toEqual({ ok: true, signing: createdSigning });
   });
 
+  it("asks each Signer after the Signing is persisted", async () => {
+    const ports = fakePorts();
+    const secondSigner: Signer = {
+      name: "Grace Hopper",
+      taxIdentificationNumber: "198001011231",
+      email: "grace@example.com",
+    };
+
+    const result = await createSigning(
+      validCommand({ signers: [...signers, secondSigner] }),
+      ports,
+    );
+
+    expect(ports.mailer.sendForSigning).toHaveBeenCalledTimes(2);
+    expect(ports.mailer.sendForSigning).toHaveBeenNthCalledWith(1, {
+      to: "ada@example.com",
+      subject: "Employment contract",
+      body: "Employment contract\n\nPlease sign",
+    });
+    expect(ports.mailer.sendForSigning).toHaveBeenNthCalledWith(2, {
+      to: "grace@example.com",
+      subject: "Employment contract",
+      body: "Employment contract\n\nPlease sign",
+    });
+    expect(
+      ports.signingRepository.create.mock.invocationCallOrder[0],
+    ).toBeLessThan(ports.mailer.sendForSigning.mock.invocationCallOrder[0]);
+    expect(result).toEqual({ ok: true, signing: createdSigning });
+  });
+
+  it("asks with Document name only when Message is empty", async () => {
+    const ports = fakePorts();
+
+    await createSigning(validCommand({ message: "" }), ports);
+
+    expect(ports.mailer.sendForSigning).toHaveBeenCalledWith({
+      to: "ada@example.com",
+      subject: "Employment contract",
+      body: "Employment contract",
+    });
+  });
+
   it("returns invalidInput with zero I/O when prepare values fail validation", async () => {
     const ports = fakePorts();
 
@@ -125,6 +176,7 @@ describe("createSigning", () => {
     expect(ports.documentStore.store).not.toHaveBeenCalled();
     expect(ports.documentStore.delete).not.toHaveBeenCalled();
     expect(ports.signingRepository.create).not.toHaveBeenCalled();
+    expect(ports.mailer.sendForSigning).not.toHaveBeenCalled();
   });
 
   it("returns invalidDocument with zero I/O when Document bytes are empty", async () => {
@@ -139,6 +191,7 @@ describe("createSigning", () => {
     expect(ports.documentStore.store).not.toHaveBeenCalled();
     expect(ports.documentStore.delete).not.toHaveBeenCalled();
     expect(ports.signingRepository.create).not.toHaveBeenCalled();
+    expect(ports.mailer.sendForSigning).not.toHaveBeenCalled();
   });
 
   it("returns storageFailed and does not call the repository when store fails", async () => {
@@ -151,6 +204,7 @@ describe("createSigning", () => {
     expect(result).toEqual({ ok: false, reason: "storageFailed" });
     expect(ports.signingRepository.create).not.toHaveBeenCalled();
     expect(ports.documentStore.delete).not.toHaveBeenCalled();
+    expect(ports.mailer.sendForSigning).not.toHaveBeenCalled();
   });
 
   it("deletes the Document and returns databaseUnavailable when repository create fails", async () => {
@@ -161,6 +215,7 @@ describe("createSigning", () => {
     const result = await createSigning(validCommand(), ports);
 
     expect(ports.documentStore.delete).toHaveBeenCalledWith(storedKey);
+    expect(ports.mailer.sendForSigning).not.toHaveBeenCalled();
     expect(result).toEqual({
       ok: false,
       reason: "databaseUnavailable",
@@ -177,10 +232,22 @@ describe("createSigning", () => {
     const result = await createSigning(validCommand(), ports);
 
     expect(ports.documentStore.delete).toHaveBeenCalledWith(storedKey);
+    expect(ports.mailer.sendForSigning).not.toHaveBeenCalled();
     expect(result).toEqual({
       ok: false,
       reason: "databaseUnavailable",
       documentOrphaned: true,
     });
+  });
+
+  it("returns askFailed when the mailer fails after persist", async () => {
+    const ports = fakePorts({
+      sendForSigning: vi.fn().mockRejectedValue(new Error("resend down")),
+    });
+
+    const result = await createSigning(validCommand(), ports);
+
+    expect(ports.signingRepository.create).toHaveBeenCalled();
+    expect(result).toEqual({ ok: false, reason: "askFailed" });
   });
 });

@@ -24,3 +24,11 @@ export type SigningRepository = {
     documentKey: string;
   }): Promise<CreatedSigning>;
 };
+
+export type Mailer = {
+  sendForSigning(input: {
+    to: string;
+    subject: string;
+    body: string;
+  }): Promise<void>;
+};
