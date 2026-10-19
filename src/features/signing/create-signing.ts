@@ -1,4 +1,9 @@
-import type { CreatedSigning, DocumentStore, SigningRepository } from "./ports";
+import type {
+  CreatedSigning,
+  DocumentStore,
+  Mailer,
+  SigningRepository,
+} from "./ports";
 import type { PrepareSigningValuesInput } from "./prepare-values";
 import { validatePrepareSigningValues } from "./prepare-values";
 
@@ -14,19 +19,32 @@ export type CreateSigningCommand = {
 export type CreateSigningPorts = {
   documentStore: DocumentStore;
   signingRepository: SigningRepository;
+  mailer: Mailer;
 };
 
 export type CreateSigningResult =
   | { ok: true; signing: CreatedSigning }
   | {
       ok: false;
-      reason: "invalidDocument" | "invalidInput" | "storageFailed";
+      reason:
+        | "invalidDocument"
+        | "invalidInput"
+        | "storageFailed"
+        | "askFailed";
     }
   | {
       ok: false;
       reason: "databaseUnavailable";
       documentOrphaned: boolean;
     };
+
+function askBody(documentName: string, message: string): string {
+  if (message.length === 0) {
+    return documentName;
+  }
+
+  return `${documentName}\n\n${message}`;
+}
 
 export async function createSigning(
   command: CreateSigningCommand,
@@ -80,6 +98,20 @@ export async function createSigning(
       reason: "databaseUnavailable",
       documentOrphaned: false,
     };
+  }
+
+  const body = askBody(prepared.values.documentName, prepared.values.message);
+
+  try {
+    for (const signer of prepared.values.signers) {
+      await ports.mailer.sendForSigning({
+        to: signer.email,
+        subject: prepared.values.documentName,
+        body,
+      });
+    }
+  } catch {
+    return { ok: false, reason: "askFailed" };
   }
 
   return { ok: true, signing };

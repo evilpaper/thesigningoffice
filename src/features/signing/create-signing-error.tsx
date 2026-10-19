@@ -24,6 +24,8 @@ const MESSAGE_BY_REASON: Record<CreateSigningErrorReason, string> = {
     "Dokumentet kunde inte sparas, så signeringen skapades inte. Försök igen.",
   databaseUnavailable:
     "Uppgifterna kunde inte sparas, så signeringen skapades inte. Försök igen.",
+  askFailed:
+    "Signeringen sparades, men meddelandet till undertecknarna kunde inte skickas. Försök igen.",
   networkError:
     "Anslutningen bröts, så signeringen kunde inte skapas. Kontrollera din internetanslutning och försök igen.",
 };
